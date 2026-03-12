@@ -38,6 +38,8 @@ if (PING_URL) {
 }
 
 // ── BOT DISCORD ───────────────────────────────────────────────────────────────
+const CARGO_MEMBRO_ID = '1481443977306706070';
+
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
@@ -61,6 +63,41 @@ for (const file of commandFiles) {
 client.once('ready', async () => {
   console.log(`✅ Bot online como ${client.user.tag}`);
   await postarMensagensAutomaticas(client);
+
+  // ── Garante o cargo pra quem já está no servidor ───────────────────────────
+  for (const guild of client.guilds.cache.values()) {
+    const members = await guild.members.fetch();
+    const cargo = guild.roles.cache.get(CARGO_MEMBRO_ID);
+
+    if (!cargo) {
+      console.warn(`⚠️ Cargo membro não encontrado no servidor: ${guild.name}`);
+      continue;
+    }
+
+    let contador = 0;
+    for (const member of members.values()) {
+      if (member.user.bot) continue;
+      if (!member.roles.cache.has(CARGO_MEMBRO_ID)) {
+        await member.roles.add(cargo).catch(() => {});
+        contador++;
+      }
+    }
+    console.log(`🎖️ Cargo membro atribuído a ${contador} membros em ${guild.name}`);
+  }
+});
+
+// ── Auto-role para novos membros ───────────────────────────────────────────────
+client.on('guildMemberAdd', async (member) => {
+  if (member.user.bot) return;
+
+  const cargo = member.guild.roles.cache.get(CARGO_MEMBRO_ID);
+  if (!cargo) return;
+
+  await member.roles.add(cargo).catch((err) => {
+    console.warn(`⚠️ Não foi possível dar cargo a ${member.user.tag}: ${err.message}`);
+  });
+
+  console.log(`✅ Cargo membro dado para: ${member.user.tag}`);
 });
 
 client.on('interactionCreate', async (interaction) => {
