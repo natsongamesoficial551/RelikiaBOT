@@ -140,14 +140,14 @@ export function embedIpServidor() {
     .addFields(
       {
         name: '🔗 IP do Servidor FiveM',
-        value: '```connect relikiarj.fivembr.com.br```'
+        value: '```connect IP_DO_SERVIDOR_AQUI```'
       },
       {
         name: '📥 Passo a passo',
         value: [
           '> **1.** Baixe o FiveM em [fivem.net](https://fivem.net)',
           '> **2.** Abra o FiveM e clique em **"Procurar Servidores"**',
-          '> **3.** Cole o IP na barra de busca ou pressione **F8** e digite `connect relikiarj.fivembr.com.br`',
+          '> **3.** Cole o IP na barra de busca ou pressione **F8** e digite `connect IP_DO_SERVIDOR_AQUI`',
           '> **4.** Aguarde o carregamento e divirta-se!',
         ].join('\n')
       },
