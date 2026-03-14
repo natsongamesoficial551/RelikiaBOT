@@ -446,6 +446,11 @@ export async function handleInteraction(interaction, client) {
     const cargoBase = guild.roles.cache.find(r => r.name === 'Base');
     if (cargoBase) await usuarioAlvo.roles.add(cargoBase).catch(() => {});
 
+    // Muda o apelido no servidor para o nome do personagem no jogo
+    await usuarioAlvo.setNickname(nomeJogo).catch(() => {
+      console.warn(`⚠️ Não foi possível mudar nickname de ${usuarioAlvo.user.username}`);
+    });
+
     const canalAprovados = guild.channels.cache.find(c => c.name === CANAL_APROVADOS);
     if (canalAprovados) await canalAprovados.send({ embeds: [embedAprovado(`<@${usuarioAlvo.id}>`, nomeJogo, idJogo, idadeJogo)] });
 
