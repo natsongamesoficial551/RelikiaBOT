@@ -1,5 +1,6 @@
 import {
   embedRegras,
+  embedRegrasRP,
   embedSobre,
   embedRequisitos,
   embedIpServidor,
@@ -10,7 +11,8 @@ import {
 // Mapa: nome do canal → função que retorna o conteúdo
 const CANAIS_AUTOMATICOS = {
   '📌┃regras-gerais':       () => ({ embeds: [embedRegras()] }),
-  '📋┃sobre-o-bope':        () => ({ embeds: [embedSobre()] }),
+  '📜┃regras-rp':           () => ({ embeds: [embedRegrasRP()] }),
+  '🔴┃sobre-a-faccao':      () => ({ embeds: [embedSobre()] }),
   '🎯┃requisitos-entrada':  () => ({ embeds: [embedRequisitos()] }),
   '🔗┃ip-servidor':         () => ({ embeds: [embedIpServidor()] }),
   '🛠️┃suporte':             () => {

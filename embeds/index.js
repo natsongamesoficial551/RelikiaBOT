@@ -1,53 +1,54 @@
 import { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
 
-const COR_BOPE = 0x1a1a1a;       // preto
+const COR_FAC     = 0xC0392B;    // vermelho escuro — BeiraRIO
 const COR_APROVADO = 0x2ecc71;   // verde
 const COR_REPROVADO = 0xe74c3c;  // vermelho
-const COR_INFO = 0x3498db;       // azul
-const RODAPE = 'BOPE — Batalhão de Operações Policiais Especiais | FiveM RP';
+const COR_INFO    = 0xE67E22;    // laranja
+const RODAPE = 'BeiraRIO — Organização Criminosa | FiveM RP';
 
-// ── REGRAS ────────────────────────────────────────────────────────────────────
+// ── REGRAS GERAIS (Discord) ───────────────────────────────────────────────────
 export function embedRegras() {
   return new EmbedBuilder()
-    .setColor(COR_BOPE)
-    .setTitle('📋 REGULAMENTO OFICIAL — BOPE')
-    .setDescription('Leia com atenção. O descumprimento das regras resulta em punição ou exclusão do grupo.')
+    .setColor(COR_FAC)
+    .setTitle('📋 REGULAMENTO OFICIAL — BEIRARIO')
+    .setDescription('Leia com atenção. O descumprimento das regras resulta em punição ou exclusão da organização.')
     .addFields(
       {
-        name: '🎮 1. ROLEPLAY',
+        name: '🗣️ 1. CONDUTA NO DISCORD',
         value: [
-          '> **1.1** O BOPE é uma unidade de elite. Seu personagem deve agir como tal dentro e fora de operações.',
-          '> **1.2** É proibido sair do personagem (break RP) durante ocorrências ativas.',
-          '> **1.3** Proibido RDM (matar sem motivo roleplay válido) e VDM (usar veículo como arma sem RP).',
-          '> **1.4** Não é permitido usar informações OOC (fora do personagem) dentro do jogo.',
-          '> **1.5** O uniforme e equipamento do BOPE devem ser usados apenas em serviço.',
+          '> **1.1** Respeito obrigatório com todos os membros, independente do cargo.',
+          '> **1.2** Proibido flood, spam, caps lock excessivo e mensagens repetidas.',
+          '> **1.3** Proibido divulgar links externos sem autorização da liderança.',
+          '> **1.4** Discussões e conflitos devem ser resolvidos via ticket — nunca em canais públicos.',
+          '> **1.5** Proibido expor informações internas da organização fora do servidor.',
         ].join('\n')
       },
       {
-        name: '🗣️ 2. COMUNICAÇÃO',
+        name: '🎮 2. ROLEPLAY',
         value: [
-          '> **2.1** O rádio é exclusivo para comunicações operacionais. Sem brincadeiras durante ocorrências.',
-          '> **2.2** Respeito obrigatório com todos os membros, dentro e fora do jogo.',
-          '> **2.3** Proibido expor informações internas do grupo em canais públicos.',
-          '> **2.4** Qualquer conflito deve ser resolvido via ticket — jamais em canais públicos.',
+          '> **2.1** É proibido sair do personagem (break RP) durante situações ativas.',
+          '> **2.2** Proibido RDM (matar sem motivo roleplay válido) e VDM (usar veículo como arma sem RP).',
+          '> **2.3** Não é permitido usar informações OOC (fora do personagem) dentro do jogo.',
+          '> **2.4** Qualquer ação da organização deve ter base em roleplay — sem ataque gratuito.',
+          '> **2.5** O uniforme e identificação da BeiraRIO devem ser usados apenas em atividade.',
         ].join('\n')
       },
       {
-        name: '⚙️ 3. CONDUTA',
+        name: '🔫 3. BAQUES E OPERAÇÕES',
         value: [
-          '> **3.1** Presença mínima exigida. Ausências longas devem ser justificadas no ticket de suporte.',
-          '> **3.2** Proibido fazer parte de grupos rivais ou ilegais enquanto membro ativo do BOPE.',
-          '> **3.3** Não é permitido vazar operações, estratégias ou membros para outros grupos.',
-          '> **3.4** Abuso de poder ou de patente será punido com rebaixamento imediato.',
+          '> **3.1** Nenhum baque pode ser iniciado sem autorização da liderança.',
+          '> **3.2** Proibido agir solo em baques ou invasões sem avisar no rádio.',
+          '> **3.3** Após todo baque, um relatório deve ser postado no canal correto.',
+          '> **3.4** Respeite os aliados — não atire em membros de organizações parceiras.',
         ].join('\n')
       },
       {
-        name: '🚔 4. OPERAÇÕES',
+        name: '⚙️ 4. ORGANIZAÇÃO',
         value: [
-          '> **4.1** Somente entre em operação com autorização do Coronel ou superior.',
-          '> **4.2** Proibido realizar abordagens, prisões ou operações de forma solo sem avisar ao rádio.',
-          '> **4.3** O uso de força letal só é permitido quando necessário e dentro do RP.',
-          '> **4.4** Todo relatório de operação deve ser postado no canal correto após o término.',
+          '> **4.1** Presença mínima exigida. Ausências longas devem ser justificadas via ticket.',
+          '> **4.2** Proibido fazer parte de organizações rivais enquanto membro ativo da BeiraRIO.',
+          '> **4.3** Não é permitido vazar informações de baques, estratégias ou membros.',
+          '> **4.4** Abuso de cargo ou poder será punido com rebaixamento imediato.',
         ].join('\n')
       },
       {
@@ -63,30 +64,96 @@ export function embedRegras() {
     .setTimestamp();
 }
 
-// ── SOBRE O BOPE ──────────────────────────────────────────────────────────────
+// ── REGRAS RP ─────────────────────────────────────────────────────────────────
+export function embedRegrasRP() {
+  return new EmbedBuilder()
+    .setColor(COR_INFO)
+    .setTitle('🎭 REGRAS DE ROLEPLAY — BEIRARIO')
+    .setDescription('Regras específicas de RP para membros da BeiraRIO dentro do servidor FiveM.')
+    .addFields(
+      {
+        name: '📖 1. BÁSICO DO RP',
+        value: [
+          '> **1.1** Sempre mantenha o personagem durante situações de jogo.',
+          '> **1.2** Não use informações do Discord dentro do jogo (metagame).',
+          '> **1.3** Respeite o RP dos outros jogadores, inclusive inimigos.',
+          '> **1.4** Qualquer situação de conflito deve ter contexto e motivação dentro do RP.',
+        ].join('\n')
+      },
+      {
+        name: '🔫 2. COMBATE',
+        value: [
+          '> **2.1** RDM (Random Death Match) é estritamente proibido.',
+          '> **2.2** VDM (Vehicle Death Match) é proibido — veículo não é arma.',
+          '> **2.3** Respeite o FearRP — seu personagem teme pela própria vida.',
+          '> **2.4** Após ser abatido, respeite o NLR (New Life Rule) — não retorne ao local imediatamente.',
+        ].join('\n')
+      },
+      {
+        name: '🗺️ 3. TERRITÓRIO',
+        value: [
+          '> **3.1** Respeite os territórios marcados — não invada sem autorização da liderança.',
+          '> **3.2** Baques devem ser comunicados com antecedência via rádio interno.',
+          '> **3.3** Não execute civis sem motivo dentro do RP.',
+          '> **3.4** Sequestros e assaltos devem seguir as regras do servidor FiveM.',
+        ].join('\n')
+      },
+      {
+        name: '🤝 4. ALIANÇAS E RIVAIS',
+        value: [
+          '> **4.1** Respeite os acordos de aliança — não atire em aliados.',
+          '> **4.2** Guerras devem ser declaradas formalmente pela liderança.',
+          '> **4.3** Proibido se passar por membro de outra organização (false flag).',
+        ].join('\n')
+      },
+      {
+        name: '🚔 5. COM A POLÍCIA',
+        value: [
+          '> **5.1** Render (render-se) é válido quando cercado e sob mira.',
+          '> **5.2** Fuga é permitida quando há abertura — use o bom senso do RP.',
+          '> **5.3** Proibido matar policiais sem motivo dentro do RP.',
+        ].join('\n')
+      }
+    )
+    .setFooter({ text: `${RODAPE} • Dúvidas? Abra um ticket no suporte.` })
+    .setTimestamp();
+}
+
+// ── SOBRE A FAC ───────────────────────────────────────────────────────────────
 export function embedSobre() {
   return new EmbedBuilder()
-    .setColor(COR_BOPE)
-    .setTitle('🦅 SOBRE O BOPE')
-    .setDescription('**Batalhão de Operações Policiais Especiais**\nUnidade de elite da Polícia Militar — especializada em situações de alto risco.')
+    .setColor(COR_FAC)
+    .setTitle('🔴 SOBRE A BEIRARIO')
+    .setDescription('**BeiraRIO — Organização Criminosa**\nNascida nas favelas, dominando as ruas. A BeiraRIO é uma organização mista que atua com força, estratégia e lealdade.')
     .addFields(
       {
         name: '📌 Nossa Missão',
-        value: '> Manter a ordem e a segurança da cidade com profissionalismo, tática e respeito ao roleplay. O BOPE não é um grupo qualquer — é uma unidade de excelência.'
+        value: '> Dominar e proteger nosso território com disciplina, força e lealdade. A BeiraRIO não é uma gangue qualquer — é uma organização estruturada com hierarquia e respeito.'
       },
       {
-        name: '🎯 Especialidades',
+        name: '💀 Especialidades',
         value: [
-          '> 🔫 Operações táticas em zonas de alto risco',
-          '> 🚁 Suporte aéreo e terrestre em ocorrências graves',
-          '> 🔒 Controle de reféns e negociação',
-          '> 🚔 Perseguições e abordagens avançadas',
-          '> 🧠 Inteligência e planejamento operacional',
+          '> 🔫 Baques e invasões de território',
+          '> 💊 Controle de economia e mercado interno',
+          '> 🗺️ Expansão e defesa de territórios',
+          '> 🤝 Alianças estratégicas com outras organizações',
+          '> 🧠 Planejamento e inteligência operacional',
         ].join('\n')
       },
       {
         name: '⚖️ Nossos Valores',
-        value: '> Disciplina • Lealdade • Profissionalismo • Trabalho em equipe'
+        value: '> Lealdade • Disciplina • Respeito à hierarquia • Proteção dos membros'
+      },
+      {
+        name: '🎖️ Hierarquia',
+        value: [
+          '> 👑 **Dono/Líder** — Comando máximo',
+          '> 🔴 **Sub-Dono** — Segundo em comando',
+          '> 🟠 **Gerente** — Gestão das operações',
+          '> 🟡 **Frente** — Linha de frente nos baques',
+          '> ⬜ **Soldado** — Membro ativo',
+          '> ⚫ **Base** — Recruta em período de avaliação',
+        ].join('\n')
       }
     )
     .setFooter({ text: RODAPE })
@@ -97,7 +164,7 @@ export function embedSobre() {
 export function embedRequisitos() {
   return new EmbedBuilder()
     .setColor(COR_INFO)
-    .setTitle('🎯 REQUISITOS PARA ENTRAR NO BOPE')
+    .setTitle('🎯 REQUISITOS PARA ENTRAR NA BEIRARIO')
     .setDescription('Antes de se candidatar, confirme que você atende **todos** os requisitos abaixo.')
     .addFields(
       {
@@ -114,15 +181,15 @@ export function embedRequisitos() {
       {
         name: '⭐ Diferenciais (não obrigatórios)',
         value: [
-          '> 🏅 Experiência em grupos policiais de RP',
+          '> 🏅 Experiência em organizações criminosas de RP',
           '> 🗺️ Conhecimento do mapa e dinâmica da cidade',
-          '> 🤝 Indicação de um membro ativo do BOPE',
+          '> 🤝 Indicação de um membro ativo da BeiraRIO',
         ].join('\n')
       },
       {
         name: '❌ Impedimentos',
         value: [
-          '> Fazer parte de facções criminosas ativas',
+          '> Fazer parte de organizações rivais ativas',
           '> Histórico de ban ou punição grave em outros servidores',
           '> Conduta tóxica conhecida na comunidade',
         ].join('\n')
@@ -164,7 +231,7 @@ export function embedIpServidor() {
 export function embedSuporte() {
   const embed = new EmbedBuilder()
     .setColor(COR_INFO)
-    .setTitle('🛠️ SUPORTE — BOPE')
+    .setTitle('🛠️ SUPORTE — BEIRARIO')
     .setDescription('Precisa de ajuda? Clique no botão abaixo para abrir um ticket privado.\nUm administrador irá te atender o quanto antes.')
     .addFields(
       {
@@ -197,9 +264,9 @@ export function embedSuporte() {
 // ── CANDIDATURA ───────────────────────────────────────────────────────────────
 export function embedCandidatura() {
   const embed = new EmbedBuilder()
-    .setColor(COR_BOPE)
-    .setTitle('📝 CANDIDATURA — BOPE')
-    .setDescription('Quer fazer parte da unidade de elite? Clique no botão abaixo e inicie sua candidatura.\nUm canal privado será aberto para você responder as perguntas.')
+    .setColor(COR_FAC)
+    .setTitle('📝 CANDIDATURA — BEIRARIO')
+    .setDescription('Quer fazer parte da organização? Clique no botão abaixo e inicie sua candidatura.\nUm canal privado será aberto para você responder as perguntas.')
     .addFields(
       {
         name: '📋 O processo funciona assim:',
@@ -255,7 +322,7 @@ export function embedTicketAberto(usuario) {
 // ── CANDIDATURA ABERTA ────────────────────────────────────────────────────────
 export function embedCandidaturaAberta(usuario) {
   const embed = new EmbedBuilder()
-    .setColor(COR_BOPE)
+    .setColor(COR_FAC)
     .setTitle('📝 CANDIDATURA INICIADA')
     .setDescription(`Olá ${usuario}! Responda as perguntas abaixo para concluir sua candidatura.`)
     .addFields(
@@ -264,8 +331,8 @@ export function embedCandidaturaAberta(usuario) {
         value: [
           '> **1.** Qual seu nome e idade?',
           '> **2.** Há quanto tempo você joga FiveM RP?',
-          '> **3.** Já fez parte de algum grupo policial? Qual?',
-          '> **4.** Por que quer entrar no BOPE?',
+          '> **3.** Já fez parte de alguma organização ou facção? Qual?',
+          '> **4.** Por que quer entrar na BeiraRIO?',
           '> **5.** Qual sua disponibilidade semanal?',
           '> **6.** Possui microfone e consegue se comunicar bem?',
         ].join('\n')
@@ -296,8 +363,8 @@ export function embedCandidaturaAberta(usuario) {
 export function embedAprovado(usuario) {
   return new EmbedBuilder()
     .setColor(COR_APROVADO)
-    .setTitle('✅ NOVO SOLDADO APROVADO')
-    .setDescription(`${usuario} foi aprovado e agora faz parte do BOPE!\nBem-vindo à unidade de elite. 🦅`)
+    .setTitle('✅ NOVO MEMBRO APROVADO')
+    .setDescription(`${usuario} foi aprovado e agora faz parte da BeiraRIO!\nBem-vindo à organização. 🔴`)
     .setFooter({ text: RODAPE })
     .setTimestamp();
 }
@@ -312,4 +379,4 @@ export function embedReprovado(usuario) {
     .setTimestamp();
 }
 
-export { COR_BOPE, COR_INFO, COR_APROVADO, COR_REPROVADO, RODAPE };
+export { COR_FAC, COR_INFO, COR_APROVADO, COR_REPROVADO, RODAPE };
