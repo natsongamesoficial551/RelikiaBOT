@@ -32,7 +32,7 @@ export default {
 
     const embed = new EmbedBuilder()
       .setColor(0xFF0000)
-      .setTitle(`📢 ${tituloCustom || 'AVISO OFICIAL — BOPE'}`)
+      .setTitle(`📢 ${tituloCustom || 'AVISO OFICIAL — BEIRARIO'}`)
       .setDescription(
         `> ${mensagem.split('\n').join('\n> ')}`
       )
@@ -56,7 +56,7 @@ export default {
       .setThumbnail(interaction.guild.iconURL({ dynamic: true }))
       .setImage('https://i.imgur.com/placeholder.png')
       .setFooter({
-        text: 'BOPE — Batalhão de Operações Policiais Especiais | FiveM RP',
+        text: 'BeiraRIO — Organização Criminosa | FiveM RP',
         iconURL: interaction.guild.iconURL({ dynamic: true })
       })
       .setTimestamp();
