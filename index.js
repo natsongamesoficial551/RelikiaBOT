@@ -86,18 +86,77 @@ client.once('ready', async () => {
   }
 });
 
-// ── Auto-role para novos membros ───────────────────────────────────────────────
+// ── Auto-role + Boas-vindas para novos membros ────────────────────────────────
 client.on('guildMemberAdd', async (member) => {
   if (member.user.bot) return;
 
-  const cargo = member.guild.roles.cache.get(CARGO_MEMBRO_ID);
-  if (!cargo) return;
+  const guild = member.guild;
 
-  await member.roles.add(cargo).catch((err) => {
-    console.warn(`⚠️ Não foi possível dar cargo a ${member.user.tag}: ${err.message}`);
+  // Auto-role
+  const cargo = guild.roles.cache.get(CARGO_MEMBRO_ID);
+  if (cargo) {
+    await member.roles.add(cargo).catch((err) => {
+      console.warn(`⚠️ Não foi possível dar cargo a ${member.user.tag}: ${err.message}`);
+    });
+  }
+
+  // Embed de boas-vindas
+  const canalBV = guild.channels.cache.find(c => c.name === '👋┃boas-vindas');
+  if (canalBV) {
+    const { EmbedBuilder } = await import('discord.js');
+    await canalBV.send({
+      content: `<@${member.id}>`,
+      embeds: [
+        new EmbedBuilder()
+          .setColor(0xC0392B)
+          .setTitle('👋 BEM-VINDO À BEIRARIO!')
+          .setDescription(`Salve <@${member.id}>! Seja bem-vindo ao servidor oficial da **BeiraRIO**. 🔴
+
+Aqui começa sua jornada na organização. Leia as regras e se candidate!`)
+          .setThumbnail(member.user.displayAvatarURL({ dynamic: true }))
+          .addFields(
+            { name: '📌 Primeiro passo', value: '> Leia as regras em <#regras-gerais>', inline: false },
+            { name: '📝 Quer entrar na FAC?', value: '> Acesse <#como-se-candidatar> e clique em **Me Candidatar**', inline: false },
+            { name: '🆘 Precisa de ajuda?', value: '> Abra um ticket em <#suporte>', inline: false },
+            { name: '👥 Membros no servidor', value: `> ${guild.memberCount} membros`, inline: true },
+            { name: '📅 Entrou em', value: `> <t:${Math.floor(Date.now() / 1000)}:F>`, inline: true }
+          )
+          .setFooter({ text: 'BeiraRIO — Organização Criminosa | FiveM RP' })
+          .setTimestamp()
+      ]
+    });
+  }
+
+  console.log(`✅ Boas-vindas enviado para: ${member.user.tag}`);
+});
+
+// ── Mensagem de saída ──────────────────────────────────────────────────────────
+client.on('guildMemberRemove', async (member) => {
+  if (member.user.bot) return;
+
+  const guild = member.guild;
+  const canalSaida = guild.channels.cache.find(c => c.name === '🚪┃saidas');
+  if (!canalSaida) return;
+
+  const { EmbedBuilder } = await import('discord.js');
+  await canalSaida.send({
+    embeds: [
+      new EmbedBuilder()
+        .setColor(0x2c2c2c)
+        .setTitle('🚪 MEMBRO SAIU DO SERVIDOR')
+        .setDescription(`**${member.user.username}** deixou o servidor.`)
+        .setThumbnail(member.user.displayAvatarURL({ dynamic: true }))
+        .addFields(
+          { name: '👤 Usuário', value: `> ${member.user.tag}`, inline: true },
+          { name: '📅 Saiu em', value: `> <t:${Math.floor(Date.now() / 1000)}:F>`, inline: true },
+          { name: '👥 Membros restantes', value: `> ${guild.memberCount} membros`, inline: true }
+        )
+        .setFooter({ text: 'BeiraRIO — Organização Criminosa | FiveM RP' })
+        .setTimestamp()
+    ]
   });
 
-  console.log(`✅ Cargo membro dado para: ${member.user.tag}`);
+  console.log(`👋 ${member.user.tag} saiu do servidor.`);
 });
 
 client.on('interactionCreate', async (interaction) => {
