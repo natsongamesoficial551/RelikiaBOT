@@ -1,9 +1,9 @@
 import { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
 
-const COR_FAC     = 0xC0392B;    // vermelho escuro — BeiraRIO
-const COR_APROVADO = 0x2ecc71;   // verde
-const COR_REPROVADO = 0xe74c3c;  // vermelho
-const COR_INFO    = 0xE67E22;    // laranja
+const COR_FAC      = 0xC0392B;
+const COR_APROVADO = 0x2ecc71;
+const COR_REPROVADO = 0xe74c3c;
+const COR_INFO     = 0xE67E22;
 const RODAPE = 'BeiraRIO — Organização Criminosa | FiveM RP';
 
 // ── REGRAS GERAIS (Discord) ───────────────────────────────────────────────────
@@ -243,21 +243,14 @@ export function embedSuporte() {
           '> ❓ Dúvidas gerais',
         ].join('\n')
       },
-      {
-        name: '⚠️ Atenção',
-        value: '> Não chame admins no privado. Use sempre o ticket!'
-      }
+      { name: '⚠️ Atenção', value: '> Não chame admins no privado. Use sempre o ticket!' }
     )
     .setFooter({ text: RODAPE })
     .setTimestamp();
 
   const botao = new ActionRowBuilder().addComponents(
-    new ButtonBuilder()
-      .setCustomId('abrir_ticket')
-      .setLabel('Abrir Ticket 🎟️')
-      .setStyle(ButtonStyle.Primary)
+    new ButtonBuilder().setCustomId('abrir_ticket').setLabel('Abrir Ticket 🎟️').setStyle(ButtonStyle.Primary)
   );
-
   return { embed, botao };
 }
 
@@ -277,22 +270,66 @@ export function embedCandidatura() {
           '> **4.** Você será avisado por mensagem privada',
         ].join('\n')
       },
-      {
-        name: '⏱️ Prazo de resposta',
-        value: '> Responda dentro de **24 horas** ou a candidatura será cancelada automaticamente.'
-      }
+      { name: '⏱️ Prazo de resposta', value: '> Responda dentro de **24 horas** ou a candidatura será cancelada.' }
     )
     .setFooter({ text: `${RODAPE} • Verifique os requisitos antes de se candidatar!` })
     .setTimestamp();
 
   const botao = new ActionRowBuilder().addComponents(
-    new ButtonBuilder()
-      .setCustomId('abrir_candidatura')
-      .setLabel('Me Candidatar 📝')
-      .setStyle(ButtonStyle.Success)
+    new ButtonBuilder().setCustomId('abrir_candidatura').setLabel('Me Candidatar 📝').setStyle(ButtonStyle.Success)
   );
-
   return { embed, botao };
+}
+
+// ── CANDIDATURA ABERTA ────────────────────────────────────────────────────────
+export function embedCandidaturaAberta(usuario) {
+  const embed = new EmbedBuilder()
+    .setColor(COR_FAC)
+    .setTitle('📝 CANDIDATURA INICIADA — BEIRARIO')
+    .setDescription(`Olá ${usuario}! Responda **todas** as perguntas abaixo para concluir sua candidatura.\n\n⚠️ **Use apenas informações do jogo — não informe dados reais pessoais.**`)
+    .addFields(
+      {
+        name: '🎮 Informações do Personagem',
+        value: [
+          '> **1.** Qual o **nome do seu personagem** no jogo?',
+          '> **2.** Qual o seu **ID** no servidor FiveM?',
+          '> **3.** Qual a **idade do seu personagem** no jogo?',
+        ].join('\n')
+      },
+      {
+        name: '📋 Perguntas de Candidatura',
+        value: [
+          '> **4.** Há quanto tempo você joga FiveM RP?',
+          '> **5.** Já fez parte de alguma organização ou facção? Qual?',
+          '> **6.** Por que quer entrar na BeiraRIO?',
+          '> **7.** Qual sua disponibilidade semanal?',
+        ].join('\n')
+      },
+      {
+        name: '📖 Teste de Regras — Responda Verdadeiro ou Falso',
+        value: [
+          '> **R1.** RDM (matar sem motivo de RP) é permitido?',
+          '> **R2.** Posso usar informações do Discord dentro do jogo?',
+          '> **R3.** Devo respeitar o FearRP quando estou sob mira?',
+          '> **R4.** Posso iniciar um baque sem autorização da liderança?',
+          '> **R5.** VDM (usar veículo como arma) é proibido?',
+          '> **R6.** Devo respeitar o NLR após ser abatido?',
+          '> **R7.** Posso atacar aliados durante um baque?',
+        ].join('\n')
+      },
+      {
+        name: '⚠️ Atenção',
+        value: '> Responda tudo em mensagens separadas ou em uma só. Um admin irá analisar suas respostas.\n> **Respostas corretas:** R1-F • R2-F • R3-V • R4-F • R5-V • R6-V • R7-F'
+      }
+    )
+    .setFooter({ text: RODAPE })
+    .setTimestamp();
+
+  const botoes = new ActionRowBuilder().addComponents(
+    new ButtonBuilder().setCustomId('aprovar_candidatura').setLabel('✅ Aprovar').setStyle(ButtonStyle.Success),
+    new ButtonBuilder().setCustomId('reprovar_candidatura').setLabel('❌ Reprovar').setStyle(ButtonStyle.Danger)
+  );
+  return { embed, botoes };
 }
 
 // ── TICKET ABERTO ─────────────────────────────────────────────────────────────
@@ -306,65 +343,23 @@ export function embedTicketAberto(usuario) {
     .setTimestamp();
 
   const botoes = new ActionRowBuilder().addComponents(
-    new ButtonBuilder()
-      .setCustomId('resolver_ticket')
-      .setLabel('✅ Marcar como Resolvido')
-      .setStyle(ButtonStyle.Success),
-    new ButtonBuilder()
-      .setCustomId('fechar_ticket')
-      .setLabel('❌ Fechar Ticket')
-      .setStyle(ButtonStyle.Danger)
+    new ButtonBuilder().setCustomId('resolver_ticket').setLabel('✅ Marcar como Resolvido').setStyle(ButtonStyle.Success),
+    new ButtonBuilder().setCustomId('fechar_ticket').setLabel('❌ Fechar Ticket').setStyle(ButtonStyle.Danger)
   );
-
-  return { embed, botoes };
-}
-
-// ── CANDIDATURA ABERTA ────────────────────────────────────────────────────────
-export function embedCandidaturaAberta(usuario) {
-  const embed = new EmbedBuilder()
-    .setColor(COR_FAC)
-    .setTitle('📝 CANDIDATURA INICIADA')
-    .setDescription(`Olá ${usuario}! Responda as perguntas abaixo para concluir sua candidatura.`)
-    .addFields(
-      {
-        name: '❓ Perguntas',
-        value: [
-          '> **1.** Qual seu nome e idade?',
-          '> **2.** Há quanto tempo você joga FiveM RP?',
-          '> **3.** Já fez parte de alguma organização ou facção? Qual?',
-          '> **4.** Por que quer entrar na BeiraRIO?',
-          '> **5.** Qual sua disponibilidade semanal?',
-          '> **6.** Possui microfone e consegue se comunicar bem?',
-        ].join('\n')
-      },
-      {
-        name: '⚠️ Atenção',
-        value: '> Responda todas as perguntas em uma única mensagem ou separadas. Um admin irá analisar em breve.'
-      }
-    )
-    .setFooter({ text: RODAPE })
-    .setTimestamp();
-
-  const botoes = new ActionRowBuilder().addComponents(
-    new ButtonBuilder()
-      .setCustomId('aprovar_candidatura')
-      .setLabel('✅ Aprovar')
-      .setStyle(ButtonStyle.Success),
-    new ButtonBuilder()
-      .setCustomId('reprovar_candidatura')
-      .setLabel('❌ Reprovar')
-      .setStyle(ButtonStyle.Danger)
-  );
-
   return { embed, botoes };
 }
 
 // ── APROVADO ──────────────────────────────────────────────────────────────────
-export function embedAprovado(usuario) {
+export function embedAprovado(usuario, nomeJogo, idJogo, idadeJogo) {
   return new EmbedBuilder()
     .setColor(COR_APROVADO)
     .setTitle('✅ NOVO MEMBRO APROVADO')
     .setDescription(`${usuario} foi aprovado e agora faz parte da BeiraRIO!\nBem-vindo à organização. 🔴`)
+    .addFields(
+      { name: '🎮 Nome no jogo', value: `> ${nomeJogo || 'N/A'}`, inline: true },
+      { name: '🪪 ID', value: `> ${idJogo || 'N/A'}`, inline: true },
+      { name: '🎂 Idade do personagem', value: `> ${idadeJogo || 'N/A'}`, inline: true },
+    )
     .setFooter({ text: RODAPE })
     .setTimestamp();
 }
