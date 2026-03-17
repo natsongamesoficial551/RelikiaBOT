@@ -1,6 +1,0 @@
-[build]
-  publish = "/"
-  command = "sed -i \"s|%%SUPABASE_URL%%|$SUPABASE_URL|g\" config.js && sed -i \"s|%%SUPABASE_ANON_KEY%%|$SUPABASE_ANON_KEY|g\" config.js"
-
-[build.environment]
-SECRETS_SCAN_ENABLED = "false"
