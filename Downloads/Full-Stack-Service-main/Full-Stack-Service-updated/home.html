@@ -1,0 +1,2593 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>NatanSites - Plataforma de Criação de Sites Profissionais</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Sora:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-blue: #1E40AF;
+            --secondary-blue: #3B82F6;
+            --bg-main: #F9FAFB;
+            --bg-surface: #FFFFFF;
+            --text-primary: #111827;
+            --text-secondary: #6B7280;
+            --border-color: #E5E7EB;
+            --success: #10B981;
+            --error: #EF4444;
+            --gold-accent: #FACC15;
+        }
+
+        body {
+    font-family: 'Space Grotesk', sans-serif;
+    background: var(--bg-main);
+    color: var(--text-primary);
+    overflow-x: hidden;
+    line-height: 1.6;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Sora', sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+        /* Animated Background */
+        .animated-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+            background: linear-gradient(135deg, #F9FAFB 0%, #E0E7FF 50%, #F9FAFB 100%);
+        }
+
+        .animated-bg canvas {
+            display: block;
+            opacity: 0.6;
+        }
+
+        /* Floating shapes */
+        .shape {
+            position: absolute;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(30, 64, 175, 0.1), rgba(59, 130, 246, 0.15));
+            animation: float 20s infinite ease-in-out;
+        }
+
+        .shape:nth-child(1) {
+            width: 300px;
+            height: 300px;
+            top: 10%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .shape:nth-child(2) {
+            width: 200px;
+            height: 200px;
+            top: 60%;
+            right: 15%;
+            animation-delay: 5s;
+        }
+
+        .shape:nth-child(3) {
+            width: 150px;
+            height: 150px;
+            bottom: 20%;
+            left: 50%;
+            animation-delay: 10s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(30px, -30px) rotate(120deg); }
+            66% { transform: translate(-20px, 20px) rotate(240deg); }
+        }
+
+        /* Header */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        nav {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1.2rem 3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+        }
+
+        .logo-img {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        .logo-text {
+    font-family: 'Sora', sans-serif;
+    font-size: 1.6rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: -0.03em;
+}
+
+        .nav-links {
+            display: flex;
+            gap: 3rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            position: relative;
+        }
+
+        .nav-links a:not(.btn)::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary-blue);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:not(.btn):hover::after {
+            width: 100%;
+        }
+
+        .nav-links a:not(.btn):hover {
+            color: var(--primary-blue);
+        }
+
+        .btn-login-desktop {
+            display: inline-block;
+        }
+
+        .menu-toggle {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            padding: 0.5rem;
+            z-index: 1001;
+        }
+
+        .menu-toggle span {
+            width: 25px;
+            height: 3px;
+            background: var(--primary-blue);
+            border-radius: 3px;
+            transition: all 0.3s ease;
+        }
+
+        .menu-toggle.active span:nth-child(1) {
+            transform: rotate(45deg) translate(8px, 8px);
+        }
+
+        .menu-toggle.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .menu-toggle.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -7px);
+        }
+
+        .btn {
+    padding: 0.85rem 2rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: none;
+    text-decoration: none;
+    display: inline-block;
+    font-family: 'Space Grotesk', sans-serif;
+    letter-spacing: -0.01em;
+}
+
+        .btn-primary {
+            background: var(--primary-blue);
+            color: white;
+            box-shadow: 0 4px 14px rgba(30, 64, 175, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: var(--secondary-blue);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(30, 64, 175, 0.4);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--primary-blue);
+            border: 2px solid var(--primary-blue);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary-blue);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 8rem 3rem 6rem;
+            position: relative;
+        }
+
+        .hero-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 5rem;
+            align-items: center;
+            width: 100%;
+        }
+
+        .hero-left {
+            animation: fadeInLeft 1s ease;
+        }
+
+        @keyframes fadeInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, rgba(30, 64, 175, 0.1), rgba(59, 130, 246, 0.1));
+            color: var(--primary-blue);
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(30, 64, 175, 0.2);
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 800;
+            line-height: 1.15;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+        }
+
+        .hero h1 .highlight {
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            line-height: 1.8;
+            margin-bottom: 2.5rem;
+            max-width: 600px;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .hero-right {
+            position: relative;
+            animation: fadeInRight 1s ease;
+        }
+
+        @keyframes fadeInRight {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .hero-visual {
+            width: 100%;
+            height: 500px;
+            background: linear-gradient(135deg, rgba(30, 64, 175, 0.05), rgba(59, 130, 246, 0.05));
+            border-radius: 24px;
+            border: 2px solid rgba(30, 64, 175, 0.1);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+        }
+
+        .hero-visual::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(59, 130, 246, 0.1), transparent);
+            animation: shine 3s infinite;
+        }
+
+        @keyframes shine {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Benefits Section */
+        .benefits {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 8rem 3rem;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 5rem;
+        }
+
+        .section-label {
+            display: inline-block;
+            color: var(--primary-blue);
+            font-weight: 600;
+            font-size: 0.95rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+        }
+
+        .section-title {
+            font-size: clamp(2.5rem, 4vw, 3.5rem);
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+        }
+
+        .section-description {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.8;
+        }
+
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2.5rem;
+        }
+
+        .benefit-card {
+            background: var(--bg-surface);
+            padding: 3rem;
+            border-radius: 20px;
+            border: 2px solid var(--border-color);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .benefit-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(30, 64, 175, 0.03), transparent);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .benefit-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(30, 64, 175, 0.15);
+            border-color: var(--primary-blue);
+        }
+
+        .benefit-card:hover::before {
+            opacity: 1;
+        }
+
+        .benefit-card h3 {
+            font-size: 1.75rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+            position: relative;
+        }
+
+        .benefit-card p {
+            color: var(--text-secondary);
+            line-height: 1.8;
+            font-size: 1.05rem;
+        }
+
+        /* Plans Section */
+        .plans {
+            background: linear-gradient(180deg, var(--bg-main) 0%, #E0E7FF 100%);
+            padding: 8rem 3rem;
+            position: relative;
+        }
+
+        .plans-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .plans-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 3rem;
+            margin-top: 4rem;
+        }
+
+        .plan-card {
+            background: var(--bg-surface);
+            padding: 3.5rem;
+            border-radius: 24px;
+            border: 2px solid var(--border-color);
+            position: relative;
+            transition: all 0.4s ease;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        }
+
+        .plan-card.featured {
+            border-color: var(--primary-blue);
+            border-width: 3px;
+            transform: scale(1.03);
+            box-shadow: 0 20px 50px rgba(30, 64, 175, 0.2);
+        }
+
+        .plan-badge {
+            position: absolute;
+            top: -15px;
+            right: 3rem;
+            background: linear-gradient(135deg, var(--gold-accent), #FDE047);
+            color: var(--text-primary);
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 12px rgba(250, 204, 21, 0.4);
+        }
+
+        .plan-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 25px 60px rgba(30, 64, 175, 0.15);
+        }
+
+        .plan-card.featured:hover {
+            transform: translateY(-8px) scale(1.05);
+        }
+
+        .plan-header {
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .plan-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .plan-subtitle {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        .plan-price {
+    font-size: 2.7rem;
+    font-weight: 800;
+    color: var(--primary-blue);
+    margin: 1.5rem 0;
+    font-family: 'Sora', sans-serif;
+    letter-spacing: -0.03em;
+}
+
+.plan-price span {
+    font-size: 1.3rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+    font-family: 'Space Grotesk', sans-serif;
+}
+
+        .plan-features {
+            list-style: none;
+            margin: 2rem 0 2.5rem;
+        }
+
+        .plan-features li {
+            padding: 1rem 0;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 1.05rem;
+        }
+
+        .plan-features li:last-child {
+            border-bottom: none;
+        }
+
+        .plan-features li::before {
+            content: '✓';
+            color: var(--success);
+            font-weight: 700;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+
+        /* Testimonials */
+        .testimonials {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 8rem 3rem;
+        }
+
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2.5rem;
+            margin-top: 4rem;
+        }
+
+        .testimonial-card {
+            background: var(--bg-surface);
+            padding: 2.5rem;
+            border-radius: 20px;
+            border: 2px solid var(--border-color);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .testimonial-card::before {
+            content: '"';
+            position: absolute;
+            top: 1.5rem;
+            right: 2rem;
+            font-size: 6rem;
+            color: var(--border-color);
+            font-family: Georgia, serif;
+            line-height: 1;
+        }
+
+        .testimonial-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(30, 64, 175, 0.1);
+            border-color: var(--secondary-blue);
+        }
+
+        .stars {
+            color: var(--gold-accent);
+            margin-bottom: 1.5rem;
+            font-size: 1.3rem;
+        }
+
+        .testimonial-text {
+            color: var(--text-secondary);
+            line-height: 1.8;
+            font-size: 1.05rem;
+            margin-bottom: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .testimonial-avatar {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.3rem;
+        }
+
+        .testimonial-info h4 {
+            font-size: 1.1rem;
+            margin-bottom: 0.25rem;
+            color: var(--text-primary);
+        }
+
+        .testimonial-info p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--text-primary);
+            color: white;
+            padding: 5rem 3rem 2rem;
+            position: relative;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 4rem;
+            margin-bottom: 3rem;
+        }
+
+        .footer-section h4 {
+            margin-bottom: 1.5rem;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .footer-brand p {
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+        }
+
+        .footer-section a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            display: block;
+            margin-bottom: 0.75rem;
+            transition: color 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .footer-section a:hover {
+            color: var(--secondary-blue);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .social-links a {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            font-size: 1.2rem;
+        }
+
+        .social-links a:hover {
+            background: var(--primary-blue);
+            transform: translateY(-3px);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.95rem;
+        }
+
+        /* ============================================ */
+        /* 💬 CHAT FLUTUANTE - ESTILOS */
+        /* ============================================ */
+
+        .floating-chat {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            z-index: 9999;
+        }
+
+        .chat-button {
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            color: white;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 6px 24px rgba(30, 64, 175, 0.4);
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .chat-button:hover {
+            transform: scale(1.1) rotate(10deg);
+            box-shadow: 0 8px 30px rgba(30, 64, 175, 0.5);
+        }
+
+        .chat-button.active {
+            background: var(--error);
+        }
+
+        .chat-notification-dot {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 12px;
+            height: 12px;
+            background: #EF4444;
+            border-radius: 50%;
+            border: 2px solid white;
+            animation: pulse-dot 2s infinite;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.7; }
+        }
+
+        .chat-window {
+            position: fixed;
+            bottom: 85px;
+            right: 25px;
+            width: 400px;
+            height: 600px;
+            max-height: calc(100vh - 110px);
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            animation: slideUp 0.3s ease;
+        }
+
+        .chat-window.active {
+            display: flex;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .chat-window-header {
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            color: white;
+            padding: 1.2rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .chat-window-title {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .chat-window-title h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .chat-window-title span {
+            font-size: 1.5rem;
+        }
+
+        .btn-close-chat {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .btn-close-chat:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .chat-window-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            background: #F9FAFB;
+        }
+
+        .chat-window-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-window-messages::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .chat-window-messages::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 10px;
+        }
+
+        .chat-message {
+            display: flex;
+            gap: 0.8rem;
+            animation: messageSlide 0.3s ease;
+        }
+
+        @keyframes messageSlide {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .chat-message.user {
+            flex-direction: row-reverse;
+        }
+
+        .chat-message-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .chat-message.ai .chat-message-avatar {
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            color: white;
+        }
+
+        .chat-message.user .chat-message-avatar {
+            background: linear-gradient(135deg, var(--success), #059669);
+            color: white;
+        }
+
+        .chat-message-content {
+            max-width: 75%;
+            padding: 0.9rem 1.2rem;
+            border-radius: 14px;
+            line-height: 1.5;
+            font-size: 0.95rem;
+        }
+
+        .chat-message.ai .chat-message-content {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-bottom-left-radius: 4px;
+        }
+
+        .chat-message.user .chat-message-content {
+            background: var(--primary-blue);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .chat-typing-indicator {
+            display: none;
+            padding: 0.9rem 1.2rem;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            width: fit-content;
+        }
+
+        .chat-typing-indicator.show {
+            display: flex;
+            gap: 0.4rem;
+            align-items: center;
+        }
+
+        .chat-typing-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--text-secondary);
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+
+        .chat-typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .chat-typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% {
+                transform: translateY(0);
+            }
+            30% {
+                transform: translateY(-8px);
+            }
+        }
+
+        .chat-window-input {
+            padding: 1rem 1.5rem;
+            background: white;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 0.8rem;
+            align-items: flex-end;
+            flex-shrink: 0;
+        }
+
+        .chat-input-field {
+            flex: 1;
+            padding: 0.8rem 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 20px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.95rem;
+            color: var(--text-primary);
+            background: #F9FAFB;
+            resize: none;
+            min-height: 42px;
+            max-height: 100px;
+            transition: all 0.3s ease;
+        }
+
+        .chat-input-field:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            background: white;
+        }
+
+        .btn-send-chat {
+            width: 42px;
+            height: 42px;
+            min-width: 42px;
+            min-height: 42px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .btn-send-chat:hover:not(:disabled) {
+            transform: scale(1.1);
+        }
+
+        .btn-send-chat:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .chat-welcome {
+            text-align: center;
+            padding: 2rem 1rem;
+        }
+
+        .chat-welcome h3 {
+            font-size: 1.2rem;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .chat-welcome p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        /* ============================================ */
+        /* 🔔 AVISO DE BOAS-VINDAS */
+        /* ============================================ */
+
+        .welcome-notice {
+            position: fixed;
+            top: 100px;
+            right: 25px;
+            width: 380px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            padding: 1.5rem;
+            z-index: 9998;
+            animation: slideInRight 0.5s ease;
+            border-left: 4px solid var(--primary-blue);
+        }
+
+        .welcome-notice.hidden {
+            animation: slideOutRight 0.5s ease forwards;
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideOutRight {
+            from {
+                opacity: 1;
+                transform: translateX(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+        }
+
+        .welcome-notice-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .welcome-notice-icon {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .btn-close-notice {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 1.3rem;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-close-notice:hover {
+            background: rgba(0, 0, 0, 0.05);
+            color: var(--text-primary);
+        }
+
+        .welcome-notice-content h3 {
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .welcome-notice-content p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .welcome-notice-highlight {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.8rem;
+            background: linear-gradient(135deg, rgba(30, 64, 175, 0.05), rgba(59, 130, 246, 0.05));
+            border-radius: 10px;
+            font-size: 0.9rem;
+            color: var(--primary-blue);
+            font-weight: 600;
+        }
+
+        .welcome-notice-highlight span:first-child {
+            font-size: 1.3rem;
+        }
+
+        /* ============================================ */
+        /* 📱 RESPONSIVIDADE - CHAT FLUTUANTE */
+        /* ============================================ */
+
+        @media (max-width: 768px) {
+            .chat-button {
+                width: 60px;
+                height: 60px;
+                font-size: 1.6rem;
+            }
+
+            .chat-window {
+                width: calc(100vw - 30px);
+                height: calc(100vh - 150px);
+                bottom: 75px;
+                right: 15px;
+                left: 15px;
+            }
+
+            .chat-window-header {
+                padding: 1rem 1.2rem;
+            }
+
+            .chat-window-title h3 {
+                font-size: 1rem;
+            }
+
+            .chat-window-messages {
+                padding: 1.2rem 1rem;
+                gap: 1rem;
+            }
+
+            .chat-message {
+                gap: 0.6rem;
+            }
+
+            .chat-message-avatar {
+                width: 30px;
+                height: 30px;
+                font-size: 0.95rem;
+            }
+
+            .chat-message-content {
+                max-width: 78%;
+                padding: 0.8rem 1rem;
+                font-size: 0.9rem;
+                line-height: 1.5;
+            }
+
+            .chat-window-input {
+                padding: 0.9rem 1rem;
+                gap: 0.7rem;
+            }
+
+            .chat-input-field {
+                padding: 0.75rem 1rem;
+                font-size: 0.9rem;
+                min-height: 40px;
+            }
+
+            .btn-send-chat {
+                width: 40px;
+                height: 40px;
+                min-width: 40px;
+                min-height: 40px;
+                font-size: 1rem;
+            }
+
+            .chat-welcome {
+                padding: 1.8rem 1rem;
+            }
+
+            .chat-welcome h3 {
+                font-size: 1.1rem;
+            }
+
+            .chat-welcome p {
+                font-size: 0.88rem;
+            }
+
+            .welcome-notice {
+                width: calc(100vw - 30px);
+                right: 15px;
+                top: 90px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .floating-chat {
+                bottom: 20px;
+                right: 20px;
+            }
+
+            .chat-button {
+                width: 55px;
+                height: 55px;
+                font-size: 1.5rem;
+            }
+
+            .chat-window {
+                width: calc(100vw - 20px);
+                height: calc(100vh - 130px);
+                bottom: 70px;
+                right: 10px;
+                left: 10px;
+            }
+
+            .chat-window-header {
+                padding: 0.9rem 1rem;
+            }
+
+            .chat-window-title h3 {
+                font-size: 0.95rem;
+            }
+
+            .chat-window-title span {
+                font-size: 1.3rem;
+            }
+
+            .btn-close-chat {
+                width: 30px;
+                height: 30px;
+                font-size: 1.1rem;
+            }
+
+            .chat-window-messages {
+                padding: 1rem 0.8rem;
+                gap: 0.9rem;
+            }
+
+            .chat-message {
+                gap: 0.5rem;
+            }
+
+            .chat-message-avatar {
+                width: 28px;
+                height: 28px;
+                font-size: 0.9rem;
+            }
+
+            .chat-message-content {
+                max-width: 80%;
+                padding: 0.75rem 0.9rem;
+                font-size: 0.88rem;
+                line-height: 1.5;
+                border-radius: 12px;
+            }
+
+            .chat-message.ai .chat-message-content {
+                border-bottom-left-radius: 3px;
+            }
+
+            .chat-message.user .chat-message-content {
+                border-bottom-right-radius: 3px;
+            }
+
+            .chat-typing-indicator {
+                padding: 0.75rem 0.9rem;
+            }
+
+            .chat-typing-dot {
+                width: 5px;
+                height: 5px;
+            }
+
+            .chat-window-input {
+                padding: 0.8rem 0.9rem;
+                gap: 0.6rem;
+            }
+
+            .chat-input-field {
+                padding: 0.7rem 0.9rem;
+                font-size: 0.88rem;
+                min-height: 38px;
+                max-height: 90px;
+                border-radius: 18px;
+            }
+
+            .btn-send-chat {
+                width: 38px;
+                height: 38px;
+                min-width: 38px;
+                min-height: 38px;
+                font-size: 0.95rem;
+            }
+
+            .chat-welcome {
+                padding: 1.5rem 0.8rem;
+            }
+
+            .chat-welcome h3 {
+                font-size: 1.05rem;
+                margin-bottom: 0.4rem;
+            }
+
+            .chat-welcome p {
+                font-size: 0.85rem;
+                line-height: 1.5;
+            }
+
+            .welcome-notice {
+                width: calc(100vw - 20px);
+                right: 10px;
+                top: 85px;
+                padding: 1.2rem;
+            }
+
+            .welcome-notice-content h3 {
+                font-size: 1rem;
+            }
+
+            .welcome-notice-content p {
+                font-size: 0.9rem;
+            }
+
+            .welcome-notice-highlight {
+                padding: 0.7rem;
+                font-size: 0.85rem;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .chat-window {
+                width: calc(100vw - 16px);
+                height: calc(100vh - 120px);
+                bottom: 65px;
+                right: 8px;
+                left: 8px;
+            }
+
+            .chat-window-messages {
+                padding: 0.9rem 0.7rem;
+                gap: 0.8rem;
+            }
+
+            .chat-message-content {
+                max-width: 82%;
+                padding: 0.7rem 0.85rem;
+                font-size: 0.85rem;
+            }
+
+            .chat-window-input {
+                padding: 0.75rem 0.8rem;
+            }
+
+            .chat-input-field {
+                padding: 0.65rem 0.85rem;
+                font-size: 0.85rem;
+            }
+
+            .btn-send-chat {
+                width: 36px;
+                height: 36px;
+                min-width: 36px;
+                min-height: 36px;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            nav {
+                padding: 1.2rem 2rem;
+            }
+
+            .nav-links {
+                gap: 2rem;
+            }
+
+            .hero-container {
+                gap: 3rem;
+            }
+
+            .hero h1 {
+                font-size: 3.2rem;
+            }
+
+            .hero p {
+                font-size: 1.15rem;
+            }
+
+            .hero-visual {
+                height: 420px;
+            }
+
+            .section-title {
+                font-size: 2.8rem;
+            }
+
+            .benefit-card,
+            .plan-card,
+            .testimonial-card {
+                padding: 2.8rem;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            nav {
+                padding: 1rem 1.5rem;
+            }
+
+            .logo-text {
+                font-size: 1.4rem;
+            }
+
+            .logo-img {
+                width: 42px;
+                height: 42px;
+            }
+
+            .hero {
+                padding: 7rem 2rem 5rem;
+            }
+
+            .hero-container {
+                grid-template-columns: 1fr;
+                gap: 4rem;
+            }
+
+            .hero h1 {
+                font-size: 2.8rem;
+            }
+
+            .hero p {
+                font-size: 1.1rem;
+            }
+
+            .hero-visual {
+                height: 380px;
+            }
+
+            .btn {
+                padding: 0.8rem 1.6rem;
+                font-size: 0.95rem;
+            }
+
+            .benefits,
+            .testimonials {
+                padding: 6rem 2rem;
+            }
+
+            .plans {
+                padding: 6rem 2rem;
+            }
+
+            .section-title {
+                font-size: 2.5rem;
+            }
+
+            .section-description {
+                font-size: 1.1rem;
+            }
+
+            .benefits-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .plans-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 2.5rem;
+            }
+
+            .testimonials-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 2rem;
+            }
+
+            .benefit-card,
+            .plan-card,
+            .testimonial-card {
+                padding: 2.5rem;
+            }
+
+            .benefit-card h3 {
+                font-size: 1.6rem;
+            }
+
+            .benefit-card p {
+                font-size: 1rem;
+            }
+
+            .plan-price {
+                font-size: 3.2rem;
+            }
+
+            .plan-features li {
+                font-size: 1rem;
+            }
+
+            .testimonial-text {
+                font-size: 1rem;
+            }
+
+            .footer-content {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 3rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .menu-toggle {
+                display: flex;
+            }
+
+            nav {
+                padding: 1rem 1.5rem;
+            }
+
+            .logo-text {
+                font-size: 1.4rem;
+            }
+
+            .logo-img {
+                width: 42px;
+                height: 42px;
+                font-size: 1.1rem;
+            }
+
+            .btn-login-desktop {
+                display: inline-block;
+                margin-left: auto;
+                margin-right: 1rem;
+            }
+
+            .nav-links {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                width: 280px;
+                height: 100vh;
+                background: white;
+                flex-direction: column;
+                padding: 6rem 2rem 2rem;
+                gap: 1.5rem;
+                box-shadow: -5px 0 20px rgba(0, 0, 0, 0.1);
+                transition: right 0.4s ease;
+                align-items: flex-start;
+                overflow-y: auto;
+            }
+
+            .nav-links.active {
+                right: 0;
+            }
+
+            .nav-links a {
+                width: 100%;
+                padding: 1rem 0;
+                border-bottom: 1px solid var(--border-color);
+            }
+
+            .nav-links a:not(.btn)::after {
+                display: none;
+            }
+
+            .nav-overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 999;
+                backdrop-filter: blur(5px);
+            }
+
+            .nav-overlay.active {
+                display: block;
+            }
+
+            .hero {
+                padding: 6rem 1.5rem 4rem;
+            }
+
+            .hero-container {
+                grid-template-columns: 1fr;
+                gap: 3rem;
+            }
+
+            .hero-badge {
+                font-size: 0.85rem;
+                padding: 0.45rem 1.3rem;
+                margin-bottom: 1.8rem;
+            }
+
+            .hero h1 {
+                font-size: 2.4rem;
+                margin-bottom: 1.3rem;
+            }
+
+            .hero p {
+                font-size: 1.05rem;
+                margin-bottom: 2.2rem;
+            }
+
+            .hero-visual {
+                height: 320px;
+            }
+
+            .hero-buttons {
+                gap: 1.2rem;
+            }
+
+            .btn {
+                padding: 0.8rem 1.5rem;
+                font-size: 0.95rem;
+            }
+
+            .benefits,
+            .testimonials {
+                padding: 5rem 1.5rem;
+            }
+
+            .plans {
+                padding: 5rem 1.5rem;
+            }
+
+            .section-label {
+                font-size: 0.9rem;
+            }
+
+            .section-title {
+                font-size: 2.2rem;
+                margin-bottom: 1.3rem;
+            }
+
+            .section-description {
+                font-size: 1.05rem;
+            }
+
+            .section-header {
+                margin-bottom: 3rem;
+            }
+
+            .benefits-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .benefit-card {
+                padding: 2.3rem;
+            }
+
+            .benefit-card h3 {
+                font-size: 1.55rem;
+                margin-bottom: 0.9rem;
+            }
+
+            .benefit-card p {
+                font-size: 1rem;
+            }
+
+            .plans-grid {
+                grid-template-columns: 1fr;
+                gap: 2.5rem;
+            }
+
+            .plan-card {
+                padding: 2.8rem;
+            }
+
+            .plan-card.featured {
+                transform: scale(1.02);
+            }
+
+            .plan-badge {
+                font-size: 0.8rem;
+                padding: 0.45rem 1.3rem;
+                top: -13px;
+                right: 2.5rem;
+            }
+
+            .plan-name {
+                font-size: 1.4rem;
+            }
+
+            .plan-subtitle {
+                font-size: 0.95rem;
+            }
+
+            .plan-price {
+                font-size: 3.2rem;
+            }
+
+            .plan-price span {
+                font-size: 1.60rem;
+            }
+
+            .plan-features li {
+                font-size: 1rem;
+                padding: 0.9rem 0;
+            }
+
+            .plan-features li::before {
+                font-size: 1.25rem;
+            }
+
+            .testimonials-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .testimonial-card {
+                padding: 2.3rem;
+            }
+
+            .testimonial-card::before {
+                font-size: 4.5rem;
+                right: 1.8rem;
+            }
+
+            .stars {
+                font-size: 1.2rem;
+            }
+
+            .testimonial-text {
+                font-size: 1rem;
+            }
+
+            .testimonial-avatar {
+                width: 52px;
+                height: 52px;
+                font-size: 1.2rem;
+            }
+
+            .testimonial-info h4 {
+                font-size: 1.05rem;
+            }
+
+            .testimonial-info p {
+                font-size: 0.9rem;
+            }
+
+            footer {
+                padding: 4rem 1.5rem 2rem;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 2.5rem;
+            }
+
+            .footer-section h4 {
+                font-size: 1.15rem;
+            }
+
+            .footer-section a {
+                font-size: 0.95rem;
+            }
+
+            .footer-brand p {
+                font-size: 0.95rem;
+            }
+
+            .social-links a {
+                width: 43px;
+                height: 43px;
+            }
+        }
+    </style>
+  <script src="/config.js"></script>
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="animated-bg">
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <canvas id="particleCanvas"></canvas>
+    </div>
+
+    <!-- Header -->
+    <header>
+        <nav>
+            <a href="#" class="logo">
+                <div class="logo-img">NS</div>
+                <span class="logo-text">NatanSites</span>
+            </a>
+            
+            <a href="./login.html" class="btn btn-outline btn-login-desktop">Entrar</a>
+            
+            <div class="menu-toggle" id="menuToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            
+            <div class="nav-overlay" id="navOverlay"></div>
+            
+            <div class="nav-links" id="navLinks">
+                <a href="#benefits">Benefícios</a>
+                <a href="#plans">Planos</a>
+                <a href="#testimonials">Depoimentos</a>
+                <a href="community.html">Comunidade</a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-container">
+            <div class="hero-left">
+                <div class="hero-badge">✨ Powered by AI Technology</div>
+                <h1>Transforme sua <span class="highlight">presença digital</span> com tecnologia de ponta</h1>
+                <p>Criamos sites profissionais modernos e otimizados que convertem visitantes em clientes. Tecnologia avançada, design premium e resultados garantidos.</p>
+                <div class="hero-buttons">
+                    <a href="#plans" class="btn btn-primary">Começar agora</a>
+                    <a href="https://natandev02.netlify.app" class="btn btn-outline">Ver projetos</a>
+                </div>
+            </div>
+            <div class="hero-right">
+                <div class="hero-visual"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Benefits Section -->
+    <section id="benefits" class="benefits">
+        <div class="section-header">
+            <span class="section-label">Vantagens</span>
+            <h2 class="section-title">Por que escolher a NatanSites?</h2>
+            <p class="section-description">Experiência completa em desenvolvimento web com foco em resultados reais e crescimento sustentável do seu negócio.</p>
+        </div>
+        
+        <div class="benefits-grid">
+            <div class="benefit-card">
+                <h3>Desenvolvimento Ágil</h3>
+                <p>Metodologia moderna de desenvolvimento que garante entregas rápidas sem comprometer a qualidade. Seu projeto pronto em tempo recorde com suporte completo em todas as etapas.</p>
+            </div>
+            
+            <div class="benefit-card">
+                <h3>Inteligência Artificial Integrada</h3>
+                <p>Potencialize seu site com recursos de IA para otimização de conteúdo, análise de comportamento e automações inteligentes que economizam tempo e aumentam conversões.</p>
+            </div>
+            
+            <div class="benefit-card">
+                <h3>Design Premium Personalizado</h3>
+                <p>Interfaces exclusivas e sofisticadas desenvolvidas especialmente para sua marca. Design que impressiona, engaja e converte seus visitantes em clientes fiéis.</p>
+            </div>
+            
+            <div class="benefit-card">
+                <h3>Performance e SEO Avançado</h3>
+                <p>Sites otimizados para velocidade máxima e melhor posicionamento nos buscadores. Carregamento ultrarrápido e visibilidade garantida no Google.</p>
+            </div>
+            
+            <div class="benefit-card">
+                <h3>Responsividade Total</h3>
+                <p>Experiência perfeita em todos os dispositivos e tamanhos de tela. Seu site funcionará impecavelmente em smartphones, tablets e desktops.</p>
+            </div>
+            
+            <div class="benefit-card">
+                <h3>Suporte e Manutenção</h3>
+                <p>Acompanhamento contínuo com atualizações regulares, backups automáticos e suporte técnico sempre que precisar. Sua tranquilidade é nossa prioridade.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Plans Section -->
+    <section id="plans" class="plans">
+        <div class="plans-container">
+            <div class="section-header">
+                <span class="section-label">Planos</span>
+                <h2 class="section-title">Escolha seu plano ideal</h2>
+                <p class="section-description">Soluções completas para diferentes necessidades e orçamentos. Transparência total nos valores.</p>
+            </div>
+            
+            <div class="plans-grid">
+                <div class="plan-card">
+                    <div class="plan-header">
+                        <h3 class="plan-name">Free</h3>
+                        <p class="plan-subtitle">Experimente gratuitamente</p>
+                    </div>
+                    <div class="plan-price">R$ 0,00</div>
+                    <ul class="plan-features">
+                        <li>NatanAI: 100 mensagens/semana</li>
+                        <li>Acesso à plataforma demo</li>
+                        <li>Acesso a comunidade</li>
+                    </ul>
+                    <a href="./login.html" class="btn btn-primary" style="width: 100%;">Começar Grátis</a>
+                </div>
+
+                <div class="plan-card">
+                    <div class="plan-header">
+                        <h3 class="plan-name">Starter</h3>
+                        <p class="plan-subtitle">Para quem está começando</p>
+                    </div>
+                    <div class="plan-price">R$ 320,00<span>   +R$39,99/Mês</span></div>
+                    <ul class="plan-features">
+                        <li>Acesso à plataforma completa</li>
+                        <li>Site responsivo básico</li>
+                        <li>Design moderno e limpo</li>
+                        <li>Otimização para mobile</li>
+                        <li>Uso comercial permitido</li>
+                        <li>Sem marca D'água</li>
+                        <li>Suporte pela plataforma 24/7</li>
+                        <li>SEO básico otimizado</li>
+                        <li>NatanAI: 1.250 mensagens/mês</li>
+                        <li>Contrato de 1 ano</li>
+                    </ul>
+                    <a href="./starter.html" class="btn btn-primary" style="width: 100%;">Escolher Starter</a>
+                </div>
+                
+                <div class="plan-card featured">
+                    <div class="plan-badge">Recomendado</div>
+                    <div class="plan-header">
+                        <h3 class="plan-name">Professional</h3>
+                        <p class="plan-subtitle">Para negócios sérios</p>
+                    </div>
+                    <div class="plan-price">R$ 530,00<span>   +R$79,99/Mês</span></div>
+                    <ul class="plan-features">
+                        <li>Acesso à plataforma completa</li>
+                        <li>Design personalizado avançado</li>
+                        <li>Animações e interatividade</li>
+                        <li>SEO avançado otimizado</li>
+                        <li>Integração de APIs</li>
+                        <li>Uso comercial permitido</li>
+                        <li>Sem marca D'água</li>
+                        <li>5 revisões incluídas</li>
+                        <li>Formulários de contato</li>
+                        <li>Suporte prioritário 24/7</li>
+                        <li>IA Inclusa - Opcional</li>
+                        <li>NatanAI: 5.000 mensagens/mês</li>
+                        <li>Contrato de 1 ano</li>
+                    </ul>
+                    <a href="./professional.html" class="btn btn-primary" style="width: 100%;">Escolher Professional</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section id="testimonials" class="testimonials">
+        <div class="section-header">
+            <span class="section-label">Depoimentos</span>
+            <h2 class="section-title">O que nossos clientes dizem</h2>
+            <p class="section-description">Histórias reais de transformação digital e sucesso nos negócios.</p>
+        </div>
+        
+        <div class="testimonials-grid">
+            <div class="testimonial-card">
+                <div class="stars">★★★★★</div>
+                <p class="testimonial-text">"Estou extremamente satisfeito com o trabalho de excelência que o Natan me prestou. Desenvolveu os sites que contratei em um rápido tempo, com uma qualidade incrível e por um valor super acessível. Parabéns pela eficiência e agilidade."</p>
+                <div class="testimonial-author">
+                    <div class="testimonial-avatar">AN</div>
+                    <div class="testimonial-info">
+                        <h4>Alexandre Nascimento</h4>
+                        <p>Gestor, Espaço Familiares</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="testimonial-card">
+                <div class="stars">★★★★★</div>
+                <p class="testimonial-text">"Natan, muito obrigada! Fiquei muito feliz com a página que você criou para o meu Instagram de yoga! Você conseguiu deixar o visual leve, bonito e funcional, facilitando o contato e o agendamento das aulas online. Foi super atencioso nos ajustes e seguiu direitinho as cores da minha identidade visual. Ficou lindo e com a minha cara! 😊"</p>
+                <div class="testimonial-author">
+                    <div class="testimonial-avatar">AG</div>
+                    <div class="testimonial-info">
+                        <h4>Alessandra Gomes</h4>
+                        <p>Professora, AlessandraYoga</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="testimonial-card">
+                <div class="stars">★★★★★</div>
+                <p class="testimonial-text">"O serviço do NatanSites é excelente! Sites bem feitos, detalhados e com ótimo preço. Super recomendo para quem busca qualidade e profissionalismo."</p>
+                <div class="testimonial-author">
+                    <div class="testimonial-avatar">AC</div>
+                    <div class="testimonial-info">
+                        <h4>Emanuel</h4>
+                        <p>Estudante, Escola</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section footer-brand">
+                <h4>NatanSites</h4>
+                <p>Transformando ideias em experiências digitais memoráveis. Tecnologia de ponta, design premium e resultados que impulsionam seu negócio.</p>
+                <div class="social-links">
+                    <a href="https://www.facebook.com/profile.php?id=100076973940954" title="Facebook">📘</a>
+                    <a href="https://www.instagram.com/nborges.ofc/" title="Instagram">📷</a>
+                    <a href="https://www.linkedin.com/in/natan-borges-b3a3b5382/" title="LinkedIn">💼</a>
+                    <a href="#" title="Discord">🦆</a>
+                </div>
+            </div>
+            
+            <div class="footer-section">
+                <h4>Serviços</h4>
+                <a href="#">Criação de Sites</a>
+                <a href="#">Landing Pages</a>
+                <a href="#">E-commerce</a>
+                <a href="#">WebSites Interativos</a>
+            </div>
+            
+            <div class="footer-section">
+                <h4>Empresa</h4>
+                <a href="https://natansites.com.br">Sobre nós</a>
+                <a href="https://natandev02.netlify.app">Portfolio</a>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; 2025 NatanSites. Todos os direitos reservados. Desenvolvido com 💙 no Brasil.</p>
+        </div>
+    </footer>
+
+    <!-- ============================================ -->
+    <!-- 🔔 AVISO DE BOAS-VINDAS -->
+    <!-- ============================================ -->
+    <div class="welcome-notice" id="welcomeNotice">
+        <div class="welcome-notice-header">
+            <div class="welcome-notice-icon">🤖</div>
+            <button class="btn-close-notice" id="closeNoticeBtn">×</button>
+        </div>
+        <div class="welcome-notice-content">
+            <h3>👋 Bem-vindo à NatanSites!</h3>
+            <p>Precisa de ajuda? Nossa IA está pronta para responder suas dúvidas sobre nossos serviços, planos e muito mais!</p>
+            <div class="welcome-notice-highlight">
+                <span>👉</span>
+                <span>Clique no botão azul no canto inferior direito</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- 💬 CHAT FLUTUANTE -->
+    <!-- ============================================ -->
+    <div class="floating-chat">
+        <div class="chat-window" id="chatWindow">
+            <div class="chat-window-header">
+                <div class="chat-window-title">
+                    <span>🤖</span>
+                    <h3>NatanAI</h3>
+                </div>
+                <button class="btn-close-chat" id="closeChatBtn">×</button>
+            </div>
+
+            <div class="chat-window-messages" id="chatWindowMessages">
+                <div class="chat-welcome">
+                    <h3>👋 Olá! Eu sou a NatanAI</h3>
+                    <p>Como posso te ajudar hoje? Estou aqui para tirar suas dúvidas sobre nossos serviços, planos e desenvolvimento web!</p>
+                </div>
+            </div>
+
+            <div id="typingIndicator" class="chat-typing-indicator">
+                <div class="chat-typing-dot"></div>
+                <div class="chat-typing-dot"></div>
+                <div class="chat-typing-dot"></div>
+            </div>
+
+            <div class="chat-window-input">
+                <textarea 
+                    class="chat-input-field" 
+                    id="chatInputField" 
+                    placeholder="Digite sua mensagem..."
+                    rows="1"
+                ></textarea>
+                <button class="btn-send-chat" id="sendChatBtn">➤</button>
+            </div>
+        </div>
+
+        <button class="chat-button" id="chatButton">
+            <span id="chatButtonIcon">💬</span>
+            <div class="chat-notification-dot" id="chatNotificationDot"></div>
+        </button>
+    </div>
+
+    <script>
+        const SUPABASE_URL = window.APP_CONFIG.SUPABASE_URL;
+        const SUPABASE_ANON_KEY = window.APP_CONFIG.SUPABASE_ANON_KEY;
+        const API_URL = 'https://natanai-dev.onrender.com/api/chat';
+
+        let chatOpen = false;
+
+        try {
+            if (!SUPABASE_URL.includes('SUPABASE_AQUI') && !SUPABASE_ANON_KEY.includes('SUPABASE_AQUI')) {
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            }
+        } catch (error) {
+            console.error('Erro ao inicializar Supabase:', error);
+        }
+
+        // ============================================
+        // 🔔 CONTROLE DO AVISO DE BOAS-VINDAS
+        // ============================================
+
+        const welcomeNotice = document.getElementById('welcomeNotice');
+        const closeNoticeBtn = document.getElementById('closeNoticeBtn');
+
+        // Mostrar aviso após 2 segundos
+        setTimeout(() => {
+            const noticeShown = sessionStorage.getItem('welcome_notice_shown');
+            if (!noticeShown) {
+                welcomeNotice.style.display = 'block';
+            }
+        }, 2000);
+
+        // Fechar aviso
+        closeNoticeBtn.addEventListener('click', () => {
+            welcomeNotice.classList.add('hidden');
+            sessionStorage.setItem('welcome_notice_shown', 'true');
+            setTimeout(() => {
+                welcomeNotice.style.display = 'none';
+            }, 500);
+        });
+
+        // ============================================
+        // 💬 CONTROLE DO CHAT FLUTUANTE
+        // ============================================
+
+        const chatButton = document.getElementById('chatButton');
+        const chatWindow = document.getElementById('chatWindow');
+        const closeChatBtn = document.getElementById('closeChatBtn');
+        const chatButtonIcon = document.getElementById('chatButtonIcon');
+        const chatNotificationDot = document.getElementById('chatNotificationDot');
+        const chatInputField = document.getElementById('chatInputField');
+        const sendChatBtn = document.getElementById('sendChatBtn');
+        const chatWindowMessages = document.getElementById('chatWindowMessages');
+        const typingIndicator = document.getElementById('typingIndicator');
+
+        // Abrir/Fechar chat
+        chatButton.addEventListener('click', () => {
+            chatOpen = !chatOpen;
+            
+            if (chatOpen) {
+                chatWindow.classList.add('active');
+                chatButton.classList.add('active');
+                chatButtonIcon.textContent = '×';
+                chatNotificationDot.style.display = 'none';
+                welcomeNotice.classList.add('hidden');
+                setTimeout(() => {
+                    welcomeNotice.style.display = 'none';
+                }, 500);
+                chatInputField.focus();
+            } else {
+                chatWindow.classList.remove('active');
+                chatButton.classList.remove('active');
+                chatButtonIcon.textContent = '💬';
+            }
+        });
+
+        closeChatBtn.addEventListener('click', () => {
+            chatOpen = false;
+            chatWindow.classList.remove('active');
+            chatButton.classList.remove('active');
+            chatButtonIcon.textContent = '💬';
+        });
+
+        // ============================================
+        // 💬 FUNÇÕES DO CHAT
+        // ============================================
+
+        function addChatMessage(content, isUser = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat-message ${isUser ? 'user' : 'ai'}`;
+            
+            messageDiv.innerHTML = `
+                <div class="chat-message-avatar">${isUser ? '👤' : '🤖'}</div>
+                <div class="chat-message-content">${content}</div>
+            `;
+
+            // Remover mensagem de boas-vindas se existir
+            const welcomeMsg = chatWindowMessages.querySelector('.chat-welcome');
+            if (welcomeMsg) {
+                welcomeMsg.remove();
+            }
+
+            chatWindowMessages.appendChild(messageDiv);
+            chatWindowMessages.scrollTop = chatWindowMessages.scrollHeight;
+        }
+
+        function showTypingIndicator() {
+            typingIndicator.classList.add('show');
+            chatWindowMessages.scrollTop = chatWindowMessages.scrollHeight;
+        }
+
+        function hideTypingIndicator() {
+            typingIndicator.classList.remove('show');
+        }
+
+        // ============================================
+        // 🌐 SISTEMA DE BROWSER ID (VISITANTES ANÔNIMOS)
+        // ============================================
+
+        // Gera ou recupera ID único do navegador
+        function getBrowserId() {
+            let browserId = localStorage.getItem('natansites_browser_id');
+            
+            if (!browserId) {
+                // Gera ID único: timestamp + random
+                browserId = 'browser_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                localStorage.setItem('natansites_browser_id', browserId);
+                console.log('🆕 Novo browser_id gerado:', browserId);
+            } else {
+                console.log('✅ Browser_id existente:', browserId);
+            }
+            
+            return browserId;
+        }
+
+        // Inicializa browser_id ao carregar a página
+        const BROWSER_ID = getBrowserId();
+
+        // ============================================
+        // 💬 FUNÇÃO DE ENVIAR MENSAGEM (ATUALIZADA)
+        // ============================================
+
+        async function sendChatMessage() {
+            const message = chatInputField.value.trim();
+            
+            if (!message) return;
+
+            // Adicionar mensagem do usuário
+            addChatMessage(message, true);
+            chatInputField.value = '';
+            chatInputField.style.height = 'auto';
+            
+            // Desabilitar botão de envio
+            sendChatBtn.disabled = true;
+            
+            // Mostrar indicador de digitação
+            showTypingIndicator();
+
+            try {
+                // 🆕 ENVIA BROWSER_ID PARA IDENTIFICAR VISITANTE ANÔNIMO
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: message,
+                        browser_id: BROWSER_ID  // 🚨 ESSENCIAL: ID único do navegador
+                        // SEM user_data = visitante anônimo (50 msgs/24h)
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Erro ${response.status}`);
+                }
+
+                const data = await response.json();
+                
+                hideTypingIndicator();
+                
+                // Verifica se atingiu limite de visitante
+                if (data.limite_atingido) {
+                    addChatMessage(data.response, false);
+                    console.log('🚫 Limite de visitante atingido:', data);
+                    return;
+                }
+                
+                if (data.response || data.resposta) {
+                    const aiResponse = data.response || data.resposta;
+                    addChatMessage(aiResponse, false);
+                    
+                    // 📊 Log de estatísticas do visitante
+                    if (data.mensagens_usadas !== undefined) {
+                        console.log('📊 Visitante Anônimo:', {
+                            mensagens_usadas: data.mensagens_usadas,
+                            limite_total: data.limite_total,
+                            mensagens_restantes: data.mensagens_restantes,
+                            tempo_para_renovar: data.tempo_para_renovar
+                        });
+                    }
+                } else {
+                    throw new Error('Resposta inválida da IA');
+                }
+
+            } catch (error) {
+                console.error('Erro ao enviar mensagem:', error);
+                hideTypingIndicator();
+                
+                let errorMessage = '😔 Desculpe, ocorreu um erro. Tente novamente em alguns instantes.';
+                
+                if (error.message.includes('Failed to fetch')) {
+                    errorMessage = '⚠️ Não foi possível conectar com a IA. Verifique sua conexão.';
+                }
+                
+                addChatMessage(errorMessage, false);
+                
+            } finally {
+                sendChatBtn.disabled = false;
+                chatInputField.focus();
+            }
+        }
+
+        // ============================================
+        // 📨 EVENT LISTENERS DO CHAT
+        // ============================================
+
+        // Event listener do botão enviar
+        sendChatBtn.addEventListener('click', sendChatMessage);
+
+        // Event listener da tecla Enter
+        chatInputField.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendChatMessage();
+            }
+        });
+
+        // Auto-resize do textarea
+        chatInputField.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+        });
+
+        // ============================================
+        // 🎯 MOBILE MENU & OUTROS
+        // ============================================
+
+        const menuToggle = document.getElementById('menuToggle');
+        const navLinks = document.getElementById('navLinks');
+        const navOverlay = document.getElementById('navOverlay');
+        const body = document.body;
+
+        function toggleMenu() {
+            menuToggle.classList.toggle('active');
+            navLinks.classList.toggle('active');
+            navOverlay.classList.toggle('active');
+            body.style.overflow = navLinks.classList.contains('active') ? 'hidden' : '';
+        }
+
+        menuToggle.addEventListener('click', toggleMenu);
+        navOverlay.addEventListener('click', toggleMenu);
+
+        navLinks.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth <= 768) {
+                    toggleMenu();
+                }
+            });
+        });
+
+        // Animated Particle Background
+        const canvas = document.getElementById('particleCanvas');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const particles = [];
+        const particleCount = 60;
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 1;
+                this.speedX = Math.random() * 0.5 - 0.25;
+                this.speedY = Math.random() * 0.5 - 0.25;
+                this.opacity = Math.random() * 0.4 + 0.1;
+            }
+
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+
+                if (this.x > canvas.width) this.x = 0;
+                if (this.x < 0) this.x = canvas.width;
+                if (this.y > canvas.height) this.y = 0;
+                if (this.y < 0) this.y = canvas.height;
+            }
+
+            draw() {
+                ctx.fillStyle = `rgba(30, 64, 175, ${this.opacity})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function init() {
+            for (let i = 0; i < particleCount; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            particles.forEach(particle => {
+                particle.update();
+                particle.draw();
+            });
+
+            particles.forEach((a, i) => {
+                particles.slice(i + 1).forEach(b => {
+                    const dx = a.x - b.x;
+                    const dy = a.y - b.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+
+                    if (distance < 120) {
+                        ctx.strokeStyle = `rgba(30, 64, 175, ${0.08 * (1 - distance / 120)})`;
+                        ctx.lineWidth = 0.8;
+                        ctx.beginPath();
+                        ctx.moveTo(a.x, a.y);
+                        ctx.lineTo(b.x, b.y);
+                        ctx.stroke();
+                    }
+                });
+            });
+
+            requestAnimationFrame(animate);
+        }
+
+        init();
+        animate();
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        const header = document.querySelector('header');
+        let lastScroll = 0;
+
+        window.addEventListener('scroll', () => {
+            const currentScroll = window.pageYOffset;
+            
+            if (currentScroll > 50) {
+                header.style.background = 'rgba(255, 255, 255, 0.95)';
+                header.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.08)';
+            } else {
+                header.style.background = 'rgba(255, 255, 255, 0.85)';
+                header.style.boxShadow = 'none';
+            }
+
+            lastScroll = currentScroll;
+        });
+
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const fadeInObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.benefit-card, .plan-card, .testimonial-card').forEach((el, index) => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(30px)';
+            el.style.transition = `all 0.6s ease ${index * 0.1}s`;
+            fadeInObserver.observe(el);
+        });
+
+        document.querySelectorAll('.btn').forEach(button => {
+            button.addEventListener('click', function(e) {
+                const ripple = document.createElement('span');
+                const rect = this.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                const x = e.clientX - rect.left - size / 2;
+                const y = e.clientY - rect.top - size / 2;
+                
+                ripple.style.width = ripple.style.height = size + 'px';
+                ripple.style.left = x + 'px';
+                ripple.style.top = y + 'px';
+                ripple.style.position = 'absolute';
+                ripple.style.borderRadius = '50%';
+                ripple.style.background = 'rgba(255, 255, 255, 0.5)';
+                ripple.style.transform = 'scale(0)';
+                ripple.style.animation = 'ripple 0.6s ease-out';
+                ripple.style.pointerEvents = 'none';
+
+                this.style.position = 'relative';
+                this.style.overflow = 'hidden';
+                this.appendChild(ripple);
+                
+                setTimeout(() => ripple.remove(), 600);
+            });
+        });
+
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes ripple {
+                to {
+                    transform: scale(2);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

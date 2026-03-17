@@ -1,0 +1,1649 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feed - NatanSites</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Sora:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+    * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --primary-blue: #1E40AF;
+    --secondary-blue: #3B82F6;
+    --bg-main: #F9FAFB;
+    --bg-surface: #FFFFFF;
+    --text-primary: #111827;
+    --text-secondary: #6B7280;
+    --border-color: #E5E7EB;
+    --success: #10B981;
+    --error: #EF4444;
+    --warning: #F59E0B;
+}
+
+body.dark-mode {
+    --primary-blue: #D4AF37;
+    --secondary-blue: #C9A227;
+    --bg-main: #0F172A;
+    --bg-surface: #1E293B;
+    --text-primary: #F9FAFB;
+    --text-secondary: #94A3B8;
+    --border-color: #334155;
+    --success: #22C55E;
+    --error: #F87171;
+    --warning: #E0C15A;
+}
+
+body {
+    font-family: 'Space Grotesk', sans-serif;
+    background: var(--bg-main);
+    color: var(--text-primary);
+    overflow-x: hidden;
+    min-height: 100vh;
+    transition: background 0.3s ease, color 0.3s ease;
+}
+
+body.dark-mode {
+    background: linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #0F172A 100%);
+}
+
+body:not(.dark-mode) {
+    background: linear-gradient(135deg, #F9FAFB 0%, #E0E7FF 50%, #F9FAFB 100%);
+}
+
+.sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 280px;
+    height: 100vh;
+    background: var(--bg-surface);
+    border-right: 2px solid var(--border-color);
+    z-index: 1000;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-header {
+    padding: 2rem 2rem 1.5rem;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-decoration: none;
+}
+
+.logo-img {
+    width: 45px;
+    height: 45px;
+    background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 1.2rem;
+}
+
+body.dark-mode .logo-img {
+    color: #0F172A;
+}
+
+.logo-text {
+    font-family: 'Sora', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.sidebar-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.5rem 0;
+}
+
+.nav-menu {
+    list-style: none;
+    padding: 0 1rem;
+}
+
+.nav-item {
+    margin-bottom: 0.5rem;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.2rem;
+    color: var(--text-secondary);
+    text-decoration: none;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    font-weight: 600;
+}
+
+.nav-link:hover {
+    background: rgba(30, 64, 175, 0.05);
+    color: var(--primary-blue);
+}
+
+.nav-link.active {
+    background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+    color: white;
+    box-shadow: 0 4px 12px rgba(30, 64, 175, 0.3);
+}
+
+body.dark-mode .nav-link.active {
+    color: #0F172A;
+}
+
+.nav-icon {
+    font-size: 1.3rem;
+}
+
+.user-section {
+    padding: 1.5rem;
+    border-top: 2px solid var(--border-color);
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    background: linear-gradient(135deg, rgba(30, 64, 175, 0.05), rgba(59, 130, 246, 0.05));
+    border-radius: 12px;
+}
+
+.user-avatar {
+    width: 45px;
+    height: 45px;
+    background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+body.dark-mode .user-avatar {
+    color: #0F172A;
+}
+
+.user-details h4 {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 0.2rem;
+}
+
+.user-details p {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.admin-badge {
+    background: linear-gradient(135deg, var(--warning), #EF4444);
+    color: white;
+    padding: 0.3rem 0.6rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+body.dark-mode .admin-badge {
+    background: linear-gradient(135deg, #E0C15A, #D4AF37);
+    color: #0F172A;
+}
+
+.btn-logout {
+    width: 100%;
+    padding: 0.85rem;
+    background: var(--error);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Space Grotesk', sans-serif;
+}
+
+.btn-logout:hover {
+    background: #DC2626;
+    transform: translateY(-2px);
+}
+
+.main-content {
+    margin-left: 280px;
+    padding: 2rem 3rem;
+    min-height: 100vh;
+    max-width: 1200px;
+}
+
+.page-header {
+    margin-bottom: 2rem;
+}
+
+.page-header h1 {
+    font-family: 'Sora', sans-serif;
+    font-size: 2.2rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+}
+
+.page-header p {
+    font-size: 1.05rem;
+    color: var(--text-secondary);
+}
+
+.tabs {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    border-bottom: 2px solid var(--border-color);
+    overflow-x: auto;
+}
+
+.tab {
+    padding: 1rem 1.5rem;
+    background: transparent;
+    border: none;
+    border-bottom: 3px solid transparent;
+    color: var(--text-secondary);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    font-family: 'Space Grotesk', sans-serif;
+}
+
+.tab:hover {
+    color: var(--primary-blue);
+    border-bottom-color: var(--primary-blue);
+}
+
+.tab.active {
+    color: var(--primary-blue);
+    border-bottom-color: var(--primary-blue);
+}
+
+body.dark-mode .tab.active {
+    color: var(--warning);
+    border-bottom-color: var(--warning);
+}
+
+.alert {
+    padding: 1rem 1.2rem;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+    font-weight: 500;
+    display: none;
+}
+
+.alert.show {
+    display: block;
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.alert-success {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--success);
+    border: 2px solid var(--success);
+}
+
+.alert-error {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--error);
+    border: 2px solid var(--error);
+}
+
+.post-creator {
+    background: var(--bg-surface);
+    border: 2px solid var(--border-color);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.post-creator h3 {
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.form-input, .form-textarea {
+    width: 100%;
+    padding: 0.8rem;
+    border: 2px solid var(--border-color);
+    border-radius: 10px;
+    background: var(--bg-main);
+    color: var(--text-primary);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.95rem;
+}
+
+.form-textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.form-input:focus, .form-textarea:focus {
+    outline: none;
+    border-color: var(--primary-blue);
+}
+
+.file-input-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.file-input-btn {
+    padding: 0.8rem 1.5rem;
+    background: var(--bg-main);
+    border: 2px dashed var(--border-color);
+    border-radius: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.file-input-btn:hover {
+    border-color: var(--primary-blue);
+    background: rgba(30, 64, 175, 0.05);
+}
+
+.file-input {
+    display: none;
+}
+
+.media-preview {
+    margin-top: 1rem;
+    border-radius: 12px;
+    overflow: hidden;
+    max-width: 100%;
+}
+
+.media-preview img, .media-preview video {
+    max-width: 100%;
+    border-radius: 12px;
+}
+
+.btn-post {
+    width: 100%;
+    padding: 1rem;
+    background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 1.05rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+body.dark-mode .btn-post {
+    color: #0F172A;
+}
+
+.btn-post:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(30, 64, 175, 0.3);
+}
+
+.feed-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.post-card {
+    background: var(--bg-surface);
+    border: 2px solid var(--border-color);
+    border-radius: 16px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.post-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.post-card.pinned {
+    border: 2px solid var(--warning);
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
+}
+
+.pinned-badge {
+    background: linear-gradient(135deg, var(--warning), #EF4444);
+    color: white;
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.post-header {
+    padding: 1.5rem 1.5rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.post-avatar {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 1.2rem;
+}
+
+body.dark-mode .post-avatar {
+    color: #0F172A;
+}
+
+.post-author-info {
+    flex: 1;
+}
+
+.post-author-name {
+    font-weight: 700;
+    font-size: 1.05rem;
+    margin-bottom: 0.2rem;
+}
+
+.post-date {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.post-options {
+    cursor: pointer;
+    padding: 0.5rem;
+    font-size: 1.3rem;
+    color: var(--text-secondary);
+}
+
+.post-title {
+    padding: 0 1.5rem;
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.post-description {
+    padding: 0 1.5rem 1rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+.post-media {
+    width: 100%;
+    max-height: 500px;
+    object-fit: cover;
+}
+
+.post-actions {
+    padding: 1rem 1.5rem;
+    display: flex;
+    gap: 1.5rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.action-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    font-family: 'Space Grotesk', sans-serif;
+}
+
+.action-btn:hover {
+    background: var(--bg-main);
+    color: var(--primary-blue);
+}
+
+.action-btn.liked {
+    color: #EF4444;
+}
+
+.action-btn.shared {
+    color: var(--success);
+}
+
+.comments-section {
+    border-top: 1px solid var(--border-color);
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.5s ease, opacity 0.5s ease, padding 0.5s ease;
+    opacity: 0;
+    background: var(--bg-surface);
+    padding: 0 1.5rem;
+}
+
+.comments-section.show {
+    max-height: 1000px;
+    overflow-y: auto;
+    padding: 1.5rem;
+    opacity: 1;
+}
+
+.comments-section::-webkit-scrollbar {
+    width: 8px;
+}
+
+.comments-section::-webkit-scrollbar-track {
+    background: var(--bg-main);
+    border-radius: 10px;
+}
+
+.comments-section::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 10px;
+}
+
+.comments-section::-webkit-scrollbar-thumb:hover {
+    background: var(--text-secondary);
+}
+
+.comment-input-wrapper {
+    display: flex;
+    gap: 0.8rem;
+    margin-bottom: 1rem;
+}
+
+.comment-input {
+    flex: 1;
+    padding: 0.8rem;
+    border: 2px solid var(--border-color);
+    border-radius: 10px;
+    background: var(--bg-main);
+    color: var(--text-primary);
+    font-family: 'Space Grotesk', sans-serif;
+}
+
+.comment-input:focus {
+    outline: none;
+    border-color: var(--primary-blue);
+}
+
+.btn-send-comment {
+    padding: 0.8rem 1.2rem;
+    background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+body.dark-mode .btn-send-comment {
+    color: #0F172A;
+}
+
+.comments-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.comment-item {
+    display: flex;
+    gap: 0.8rem;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.comment-avatar {
+    width: 35px;
+    height: 35px;
+    background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+}
+
+body.dark-mode .comment-avatar {
+    color: #0F172A;
+}
+
+.comment-content {
+    flex: 1;
+    background: var(--bg-main);
+    padding: 0.8rem;
+    border-radius: 10px;
+}
+
+.comment-author {
+    font-weight: 700;
+    font-size: 0.9rem;
+    margin-bottom: 0.3rem;
+}
+
+.comment-text {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.comment-date {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin-top: 0.3rem;
+}
+
+.empty-feed {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--text-secondary);
+}
+
+.empty-feed-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.mobile-menu-toggle {
+    display: none;
+    position: fixed;
+    top: 1.5rem;
+    left: 1.5rem;
+    z-index: 1001;
+    background: var(--primary-blue);
+    color: white;
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(30, 64, 175, 0.3);
+    border: none;
+}
+
+.mobile-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    backdrop-filter: blur(5px);
+}
+
+@media (max-width: 768px) {
+            .mobile-menu-toggle {
+                display: flex;
+            }
+
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .mobile-overlay.active {
+                display: block;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 6rem 1rem 2rem;
+            }
+
+            .chat-layout {
+                flex-direction: column;
+                height: calc(100vh - 150px);
+            }
+
+            .contacts-sidebar {
+                width: 100%;
+                max-height: 40%;
+                border-right: none;
+                border-bottom: 2px solid var(--border-color);
+            }
+
+            .chat-area {
+                display: none;
+            }
+
+            .chat-area.active {
+                display: flex;
+            }
+
+            .contacts-sidebar.hide-mobile {
+                display: none;
+            }
+
+            .chat-message {
+                max-width: 85%;
+            }
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .chat-messages::-webkit-scrollbar,
+        .contacts-list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .chat-messages::-webkit-scrollbar-track,
+        .contacts-list::-webkit-scrollbar-track {
+            background: var(--bg-main);
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb,
+        .contacts-list::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+    </style>
+  <script src="/config.js"></script>
+</head>
+<body>
+    <button class="mobile-menu-toggle" id="mobileMenuToggle">
+        <span style="font-size: 1.5rem;">☰</span>
+    </button>
+    <div class="mobile-overlay" id="mobileOverlay"></div>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="#" class="logo">
+                <img class="logo-img" src="./assets/crie-um-imagem-de-logo-do-discord--deixe-no-tamanh (2).png" alt="">
+                <span class="logo-text">NatanSites</span>
+            </a>
+        </div>
+
+        <div class="sidebar-content">
+            <nav>
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="dashboard.html" class="nav-link">
+                            <span class="nav-icon">🏠</span>
+                            <span>Início</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="portfolio.html" class="nav-link">
+                            <span class="nav-icon">🌐</span>
+                            <span>Portfólio</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="community.html" class="nav-link">
+                            <span class="nav-icon">👥</span>
+                            <span>Comunidade</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="suporte.html" class="nav-link">
+                            <span class="nav-icon">💬</span>
+                            <span>Suporte</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="natanai.html" class="nav-link">
+                            <span class="nav-icon">🤖</span>
+                            <span>NatanAI</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="settings.html" class="nav-link">
+                            <span class="nav-icon">⚙️</span>
+                            <span>Configurações</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <div class="user-section">
+            <div class="user-info">
+                <div class="user-avatar" id="userAvatar">NS</div>
+                <div class="user-details">
+                    <h4 id="userName">Carregando...</h4>
+                    <p id="userPlan">Verificando...</p>
+                </div>
+            </div>
+            <button class="btn-logout" id="logoutBtn">🚪 Sair</button>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <div class="page-header">
+            <h1>📰 Feed de Atualizações</h1>
+            <p>Acompanhe as últimas novidades e atualizações</p>
+        </div>
+
+        <div id="alertBox" class="alert"></div>
+
+        <div class="tabs">
+            <button class="tab" onclick="window.location.href='community.html?tab=stats'">📊 Estatísticas</button>
+            <button class="tab" onclick="window.location.href='chat.html?tab=chat'">💬 Chat Privado</button>
+            <button class="tab" onclick="window.location.href='feed.html?tab=feed'">📰 Feed</button>
+            <button class="tab" onclick="window.location.href='websites.html?tab=websites'">🌐 WebSites</button>
+            <button class="tab" onclick="window.location.href='novidades.html?tab=news'">📢 Novidades</button>
+            <button class="tab" onclick="window.location.href='depoimentos.html?tab=events'">⭐ Depoimentos</button>
+        </div>
+
+        <div class="post-creator" id="postCreator" style="display: none;">
+            <h3>✍️ Criar Publicação</h3>
+            <form id="createPostForm">
+                <div class="form-group">
+                    <label for="postTitle">Título</label>
+                    <input type="text" id="postTitle" class="form-input" placeholder="Digite o título da publicação..." required>
+                </div>
+                <div class="form-group">
+                    <label for="postDescription">Descrição</label>
+                    <textarea id="postDescription" class="form-textarea" placeholder="Digite a descrição..." required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Mídia (Imagem ou Vídeo - máx 3min)</label>
+                    <div class="file-input-wrapper">
+                        <label class="file-input-btn">
+                            <span>📎 Escolher arquivo</span>
+                            <input type="file" id="postMedia" class="file-input" accept="image/*,video/*">
+                        </label>
+                    </div>
+                    <div id="mediaPreview" class="media-preview"></div>
+                </div>
+                <button type="submit" class="btn-post">🚀 Publicar</button>
+            </form>
+        </div>
+
+        <div class="feed-container" id="feedContainer">
+            <div class="empty-feed">
+                <div class="empty-feed-icon">📰</div>
+                <h3>Carregando feed...</h3>
+                <p>Aguarde enquanto buscamos as publicações</p>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const SUPABASE_URL = window.APP_CONFIG.SUPABASE_URL;
+        const SUPABASE_ANON_KEY = window.APP_CONFIG.SUPABASE_ANON_KEY;
+        const ADMIN_EMAIL = 'natan@natandev.com';
+
+        let currentUser = null;
+        let isAdmin = false;
+
+        try {
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        } catch (error) {
+            console.error('Erro ao inicializar Supabase:', error);
+        }
+
+        async function checkAuth() {
+            if (!supabase) {
+                window.location.href = 'login.html';
+                return false;
+            }
+
+            try {
+                const { data: { session }, error } = await supabase.auth.getSession();
+                
+                if (error || !session?.user) {
+                    window.location.href = 'login.html';
+                    return false;
+                }
+
+                currentUser = session.user;
+                isAdmin = currentUser.email === ADMIN_EMAIL;
+                
+                await loadUserInfo();
+                await loadAndApplyTheme();
+                
+                if (isAdmin) {
+                    document.getElementById('postCreator').style.display = 'block';
+                }
+                
+                await loadFeed();
+                subscribeToRealtimePosts();
+                
+                return true;
+            } catch (error) {
+                console.error('Erro ao verificar autenticação:', error);
+                window.location.href = 'login.html';
+                return false;
+            }
+        }
+
+        async function loadUserInfo() {
+            const username = currentUser.email.split('@')[0];
+            const initials = username.substring(0, 2).toUpperCase();
+            
+            document.getElementById('userName').textContent = username;
+            document.getElementById('userAvatar').textContent = initials;
+
+            if (isAdmin) {
+                document.getElementById('userPlan').innerHTML = '👑 <span class="admin-badge">ADMIN</span>';
+            } else {
+                document.getElementById('userPlan').textContent = '✨ Membro';
+            }
+
+            console.log('✅ Interface do usuário carregada');
+        }
+
+        async function loadFeed() {
+            if (!supabase) return;
+
+            try {
+                const { data: posts, error } = await supabase
+                    .from('feed_posts')
+                    .select('*')
+                    .order('created_at', { ascending: false })
+                    .limit(50);
+
+                if (error) throw error;
+
+                const { data: userLikes } = await supabase
+                    .from('post_likes')
+                    .select('post_id')
+                    .eq('user_id', currentUser.id);
+
+                const likedPostIds = new Set(userLikes?.map(l => l.post_id) || []);
+
+                const feedContainer = document.getElementById('feedContainer');
+                feedContainer.innerHTML = '';
+
+                if (!posts || posts.length === 0) {
+                    feedContainer.innerHTML = `
+                        <div class="empty-feed">
+                            <div class="empty-feed-icon">📰</div>
+                            <h3>Nenhuma publicação ainda</h3>
+                            <p>Seja o primeiro a compartilhar algo!</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                posts.forEach(post => {
+                    post.user_liked = likedPostIds.has(post.id);
+                    renderPost(post);
+                });
+
+                console.log('✅ Feed carregado:', posts.length, 'posts');
+            } catch (error) {
+                console.error('❌ Erro ao carregar feed:', error);
+                showAlert('Erro ao carregar feed', 'error');
+            }
+        }
+
+        function renderPost(post) {
+    const feedContainer = document.getElementById('feedContainer');
+    
+    const authorUsername = post.author_email.split('@')[0];
+    const authorInitials = authorUsername.substring(0, 2).toUpperCase();
+    
+    const postDate = new Date(post.created_at);
+    const dateString = postDate.toLocaleDateString('pt-BR', {
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+
+    const postCard = document.createElement('div');
+    postCard.className = `post-card ${post.is_pinned ? 'pinned' : ''}`;
+    postCard.dataset.postId = post.id;
+
+    let mediaHTML = '';
+    if (post.media_url) {
+        if (post.media_type === 'image') {
+            mediaHTML = `<img src="${post.media_url}" alt="${post.title}" class="post-media">`;
+        } else if (post.media_type === 'video') {
+            mediaHTML = `
+                <video controls class="post-media">
+                    <source src="${post.media_url}" type="video/mp4">
+                    Seu navegador não suporta vídeo.
+                </video>
+            `;
+        }
+    }
+
+    postCard.innerHTML = `
+        ${post.is_pinned ? '<div class="pinned-badge">📌 Fixado</div>' : ''}
+        
+        <div class="post-header">
+            <div class="post-avatar">${authorInitials}</div>
+            <div class="post-author-info">
+                <div class="post-author-name">@${authorUsername}</div>
+                <div class="post-date">${dateString}</div>
+            </div>
+            ${isAdmin ? `
+                <div class="post-options" onclick="openPostOptions('${post.id}')">
+                    ⋮
+                </div>
+            ` : ''}
+        </div>
+
+        ${post.title ? `<h3 class="post-title">${post.title}</h3>` : ''}
+        ${post.description ? `<p class="post-description">${post.description}</p>` : ''}
+        
+        ${mediaHTML}
+
+        <div class="post-actions">
+            <button class="action-btn ${post.user_liked ? 'liked' : ''}" onclick="toggleLike('${post.id}')">
+                ❤️ ${post.likes_count || 0}
+            </button>
+            <button class="action-btn" onclick="sharePost('${post.id}')">
+                🔗 Compartilhar
+            </button>
+        </div>
+
+        <div class="comments-section-new" id="comments-section-${post.id}">
+            <div class="comments-header">
+                <h4>💬 Comentários (${post.comments_count || 0})</h4>
+            </div>
+            
+            <div class="comment-input-wrapper">
+                <input 
+                    type="text" 
+                    class="comment-input" 
+                    placeholder="Escreva um comentário..."
+                    id="comment-input-${post.id}"
+                    onkeypress="if(event.key === 'Enter') sendComment('${post.id}')"
+                >
+                <button class="btn-send-comment" onclick="sendComment('${post.id}')">
+                    ➤
+                </button>
+            </div>
+
+            <div class="comments-preview" id="comments-preview-${post.id}">
+                <p style="text-align: center; color: var(--text-secondary); padding: 1rem;">Carregando comentários...</p>
+            </div>
+
+            <button class="btn-load-more-comments" id="load-more-${post.id}" style="display: none;" onclick="loadAllComments('${post.id}')">
+                ↓ Ver todos os comentários
+            </button>
+        </div>
+    `;
+
+    feedContainer.appendChild(postCard);
+    
+    // Carregar comentários automaticamente
+    loadCommentsPreview(post.id);
+}
+
+        async function toggleLike(postId) {
+    if (!supabase || !currentUser) return;
+
+    const btn = event.target.closest('.action-btn');
+    btn.disabled = true;
+    
+    try {
+        const { data: existingLike, error: checkError } = await supabase
+            .from('post_likes')
+            .select('*')
+            .eq('post_id', postId)
+            .eq('user_id', currentUser.id)
+            .maybeSingle();
+
+        if (checkError && checkError.code !== 'PGRST116') {
+            throw checkError;
+        }
+
+        if (existingLike) {
+            // DESCURTIR
+            const { error: deleteError } = await supabase
+                .from('post_likes')
+                .delete()
+                .eq('post_id', postId)
+                .eq('user_id', currentUser.id);
+
+            if (deleteError) throw deleteError;
+
+            const { error: rpcError } = await supabase.rpc('decrement_post_likes', { post_id: postId });
+            if (rpcError) throw rpcError;
+
+            btn.classList.remove('liked');
+            
+            // Atualizar contador diretamente no botão
+            const { data: updatedPost } = await supabase
+                .from('feed_posts')
+                .select('likes_count')
+                .eq('id', postId)
+                .single();
+            
+            btn.innerHTML = `❤️ ${updatedPost?.likes_count || 0}`;
+        } else {
+            // CURTIR
+            const { error: insertError } = await supabase
+                .from('post_likes')
+                .insert({
+                    post_id: postId,
+                    user_id: currentUser.id,
+                    user_email: currentUser.email
+                });
+
+            if (insertError) throw insertError;
+
+            const { error: rpcError } = await supabase.rpc('increment_post_likes', { post_id: postId });
+            if (rpcError) throw rpcError;
+
+            btn.classList.add('liked');
+            
+            // Atualizar contador diretamente no botão
+            const { data: updatedPost } = await supabase
+                .from('feed_posts')
+                .select('likes_count')
+                .eq('id', postId)
+                .single();
+            
+            btn.innerHTML = `❤️ ${updatedPost?.likes_count || 0}`;
+        }
+    } catch (error) {
+        console.error('❌ Erro ao curtir:', error);
+        showAlert('Erro ao processar curtida', 'error');
+    } finally {
+        btn.disabled = false;
+    }
+}
+
+        function renderComment(comment, container) {
+            const username = comment.user_email.split('@')[0];
+            const initials = username.substring(0, 2).toUpperCase();
+            
+            const commentDate = new Date(comment.created_at);
+            const dateString = commentDate.toLocaleDateString('pt-BR', {
+                day: '2-digit',
+                month: 'short',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+            const commentItem = document.createElement('div');
+            commentItem.className = 'comment-item';
+            commentItem.innerHTML = `
+                <div class="comment-avatar">${initials}</div>
+                <div class="comment-content">
+                    <div class="comment-author">@${username}</div>
+                    <div class="comment-text">${comment.content}</div>
+                    <div class="comment-date">${dateString}</div>
+                </div>
+            `;
+
+            container.appendChild(commentItem);
+        }
+
+        async function sendComment(postId) {
+    console.log('🎯 sendComment INICIADO para post:', postId);
+    
+    const input = document.getElementById(`comment-input-${postId}`);
+    
+    if (!input) {
+        console.error('❌ Input não encontrado');
+        return;
+    }
+    
+    const content = input.value.trim();
+
+    if (!content) {
+        showAlert('Digite um comentário', 'error');
+        return;
+    }
+    
+    if (!supabase || !currentUser) {
+        showAlert('Erro de autenticação', 'error');
+        return;
+    }
+
+    input.disabled = true;
+
+    try {
+        const { data: newComment, error: insertError } = await supabase
+            .from('post_comments')
+            .insert({
+                post_id: postId,
+                user_id: currentUser.id,
+                user_email: currentUser.email,
+                content: content
+            })
+            .select()
+            .single();
+
+        if (insertError) throw insertError;
+
+        const { error: rpcError } = await supabase.rpc('increment_post_comments', { post_id: postId });
+        if (rpcError) console.error('⚠️ Erro no RPC:', rpcError);
+
+        input.value = '';
+        
+        // Recarregar preview de comentários
+        await loadCommentsPreview(postId);
+        
+        // Atualizar contador no header
+        const { data: updatedPost } = await supabase
+            .from('feed_posts')
+            .select('comments_count')
+            .eq('id', postId)
+            .single();
+        
+        if (updatedPost) {
+            const header = document.querySelector(`#comments-section-${postId} .comments-header h4`);
+            if (header) {
+                header.textContent = `💬 Comentários (${updatedPost.comments_count || 0})`;
+            }
+        }
+
+        showAlert('✅ Comentário enviado!', 'success');
+    } catch (error) {
+        console.error('❌ Erro:', error);
+        showAlert('Erro ao enviar comentário', 'error');
+    } finally {
+        input.disabled = false;
+        input.focus();
+    }
+}
+
+async function loadCommentsPreview(postId) {
+    if (!supabase) return;
+
+    try {
+        const { data: comments, error } = await supabase
+            .from('post_comments')
+            .select('*')
+            .eq('post_id', postId)
+            .order('created_at', { ascending: false })
+            .limit(2);
+
+        if (error) throw error;
+
+        const previewContainer = document.getElementById(`comments-preview-${postId}`);
+        const loadMoreBtn = document.getElementById(`load-more-${postId}`);
+        
+        if (!previewContainer) return;
+        
+        previewContainer.innerHTML = '';
+
+        if (comments && comments.length > 0) {
+            comments.forEach(comment => {
+                renderComment(comment, previewContainer);
+            });
+
+            // Verificar se há mais comentários
+            const { count } = await supabase
+                .from('post_comments')
+                .select('*', { count: 'exact', head: true })
+                .eq('post_id', postId);
+
+            if (count > 2 && loadMoreBtn) {
+                loadMoreBtn.style.display = 'block';
+                loadMoreBtn.innerHTML = `↓ Ver todos os ${count} comentários`;
+            }
+        } else {
+            previewContainer.innerHTML = '<p style="text-align: center; color: var(--text-secondary); padding: 1rem;">Seja o primeiro a comentar!</p>';
+        }
+    } catch (error) {
+        console.error('❌ Erro ao carregar preview de comentários:', error);
+    }
+}
+
+async function loadAllComments(postId) {
+    if (!supabase) return;
+
+    const loadMoreBtn = document.getElementById(`load-more-${postId}`);
+    if (loadMoreBtn) {
+        loadMoreBtn.disabled = true;
+        loadMoreBtn.textContent = '⏳ Carregando...';
+    }
+
+    try {
+        const { data: comments, error } = await supabase
+            .from('post_comments')
+            .select('*')
+            .eq('post_id', postId)
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        const previewContainer = document.getElementById(`comments-preview-${postId}`);
+        if (!previewContainer) return;
+        
+        previewContainer.innerHTML = '';
+
+        if (comments && comments.length > 0) {
+            comments.forEach(comment => {
+                renderComment(comment, previewContainer);
+            });
+        }
+
+        if (loadMoreBtn) {
+            loadMoreBtn.style.display = 'block';
+            loadMoreBtn.disabled = false;
+            loadMoreBtn.textContent = '↑ Ver menos';
+            loadMoreBtn.onclick = () => loadCommentsPreview(postId);
+        }
+    } catch (error) {
+        console.error('❌ Erro ao carregar todos os comentários:', error);
+        if (loadMoreBtn) {
+            loadMoreBtn.disabled = false;
+            loadMoreBtn.textContent = '↓ Ver todos os comentários (Erro - Tentar novamente)';
+        }
+    }
+}
+
+        function sharePost(postId) {
+            const url = `${window.location.origin}/feed.html?post=${postId}`;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Veja esta publicação no NatanSites',
+                    url: url
+                }).catch(err => console.log('Erro ao compartilhar:', err));
+            } else {
+                navigator.clipboard.writeText(url);
+                showAlert('✅ Link copiado!', 'success');
+            }
+        }
+
+        function openPostOptions(postId) {
+            if (!isAdmin) return;
+
+            const options = prompt(`Opções da publicação:\n\n1. 📌 Fixar/Desafixar\n2. ✏️ Editar\n3. 🗑️ Excluir\n\nDigite o número:`);
+            
+            switch(options) {
+                case '1':
+                    togglePinPost(postId);
+                    break;
+                case '2':
+                    editPost(postId);
+                    break;
+                case '3':
+                    deletePost(postId);
+                    break;
+            }
+        }
+
+        async function editPost(postId) {
+            if (!isAdmin || !supabase) return;
+
+            try {
+                const { data: post, error: fetchError } = await supabase
+                    .from('feed_posts')
+                    .select('*')
+                    .eq('id', postId)
+                    .single();
+
+                if (fetchError) throw fetchError;
+
+                const newTitle = prompt('Novo título:', post.title);
+                if (newTitle === null) return;
+
+                const newDescription = prompt('Nova descrição:', post.description);
+                if (newDescription === null) return;
+
+                const { error: updateError } = await supabase
+                    .from('feed_posts')
+                    .update({
+                        title: newTitle.trim(),
+                        description: newDescription.trim(),
+                        updated_at: new Date().toISOString()
+                    })
+                    .eq('id', postId);
+
+                if (updateError) throw updateError;
+
+                showAlert('✅ Post editado com sucesso!', 'success');
+                await loadFeed();
+            } catch (error) {
+                console.error('❌ Erro ao editar:', error);
+                showAlert('Erro ao editar post', 'error');
+            }
+        }
+
+        async function togglePinPost(postId) {
+            try {
+                const { data: post } = await supabase
+                    .from('feed_posts')
+                    .select('is_pinned')
+                    .eq('id', postId)
+                    .single();
+
+                await supabase
+                    .from('feed_posts')
+                    .update({ is_pinned: !post.is_pinned })
+                    .eq('id', postId);
+
+                showAlert(`✅ ${!post.is_pinned ? 'Fixado' : 'Desafixado'}!`, 'success');
+                await loadFeed();
+            } catch (error) {
+                console.error('❌ Erro:', error);
+            }
+        }
+
+        async function deletePost(postId) {
+            if (!confirm('Deseja excluir esta publicação?')) return;
+
+            try {
+                await supabase
+                    .from('feed_posts')
+                    .delete()
+                    .eq('id', postId);
+
+                showAlert('✅ Publicação excluída!', 'success');
+                await loadFeed();
+            } catch (error) {
+                console.error('❌ Erro:', error);
+            }
+        }
+
+        document.getElementById('postMedia').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const preview = document.getElementById('mediaPreview');
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                if (file.type.startsWith('image/')) {
+                    preview.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+                } else if (file.type.startsWith('video/')) {
+                    preview.innerHTML = `<video src="${e.target.result}" controls></video>`;
+                }
+            };
+
+            reader.readAsDataURL(file);
+        });
+
+        document.getElementById('createPostForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const title = document.getElementById('postTitle').value.trim();
+            const description = document.getElementById('postDescription').value.trim();
+            const mediaFile = document.getElementById('postMedia').files[0];
+
+            if (!title || !description) {
+                showAlert('Preencha todos os campos', 'error');
+                return;
+            }
+
+            try {
+                let mediaUrl = null;
+                let mediaType = null;
+
+                if (mediaFile) {
+                    const fileExt = mediaFile.name.split('.').pop();
+                    const fileName = `${currentUser.id}/${Date.now()}.${fileExt}`;
+
+                    const { error: uploadError } = await supabase.storage
+                        .from('feed-media')
+                        .upload(fileName, mediaFile);
+
+                    if (uploadError) throw uploadError;
+
+                    const { data: urlData } = supabase.storage
+                        .from('feed-media')
+                        .getPublicUrl(fileName);
+
+                    mediaUrl = urlData.publicUrl;
+                    mediaType = mediaFile.type.startsWith('image/') ? 'image' : 'video';
+                }
+
+                await supabase
+                    .from('feed_posts')
+                    .insert({
+                        author_id: currentUser.id,
+                        author_email: currentUser.email,
+                        title: title,
+                        description: description,
+                        media_url: mediaUrl,
+                        media_type: mediaType
+                    });
+
+                showAlert('✅ Publicação criada!', 'success');
+                document.getElementById('createPostForm').reset();
+                document.getElementById('mediaPreview').innerHTML = '';
+                await loadFeed();
+            } catch (error) {
+                console.error('❌ Erro:', error);
+                showAlert('Erro ao criar publicação', 'error');
+            }
+        });
+
+        async function loadAndApplyTheme() {
+            const settings = localStorage.getItem(`natandev_settings_${currentUser.id}`);
+            if (settings) {
+                const { darkMode } = JSON.parse(settings);
+                if (darkMode) {
+                    document.body.classList.add('dark-mode');
+                }
+            }
+        }
+
+        function subscribeToRealtimePosts() {
+            if (!supabase) return;
+
+            supabase
+                .channel('feed_posts_channel')
+                .on('postgres_changes', 
+                    { event: '*', schema: 'public', table: 'feed_posts' },
+                    () => loadFeed()
+                )
+                .subscribe();
+        }
+
+        function showAlert(message, type) {
+            const alertBox = document.getElementById('alertBox');
+            alertBox.textContent = message;
+            alertBox.className = `alert alert-${type} show`;
+            
+            setTimeout(() => {
+                alertBox.classList.remove('show');
+            }, 5000);
+        }
+
+        document.getElementById('logoutBtn').addEventListener('click', async function() {
+            if (!confirm('Deseja realmente sair?')) return;
+
+            if (supabase) {
+                await supabase.auth.signOut();
+            }
+            
+            localStorage.removeItem('natandev_is_admin');
+            if (currentUser) {
+                localStorage.removeItem(`natandev_settings_${currentUser.id}`);
+            }
+            
+            window.location.href = 'login.html';
+        });
+
+        const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+        const sidebar = document.getElementById('sidebar');
+        const mobileOverlay = document.getElementById('mobileOverlay');
+
+        mobileMenuToggle.addEventListener('click', function() {
+            sidebar.classList.toggle('active');
+            mobileOverlay.classList.toggle('active');
+        });
+
+        mobileOverlay.addEventListener('click', function() {
+            sidebar.classList.remove('active');
+            mobileOverlay.classList.remove('active');
+        });
+
+        async function init() {
+            console.log('🚀 Inicializando Feed NatanSites...');
+            await checkAuth();
+            console.log('✅ Feed carregado com sucesso!');
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    </script>
+</body>
+</html>

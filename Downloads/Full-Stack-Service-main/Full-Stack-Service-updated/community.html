@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comunidade - NatanSites</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Sora:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-blue: #1E40AF;
+            --secondary-blue: #3B82F6;
+            --bg-main: #F9FAFB;
+            --bg-surface: #FFFFFF;
+            --text-primary: #111827;
+            --text-secondary: #6B7280;
+            --border-color: #E5E7EB;
+            --success: #10B981;
+            --error: #EF4444;
+            --warning: #F59E0B;
+            --gold: #FACC15;
+        }
+
+        body.dark-mode {
+            --primary-blue: #D4AF37;
+            --secondary-blue: #C9A227;
+            --bg-main: #0F172A;
+            --bg-surface: #1E293B;
+            --text-primary: #F9FAFB;
+            --text-secondary: #94A3B8;
+            --border-color: #334155;
+            --success: #22C55E;
+            --error: #F87171;
+            --warning: #E0C15A;
+        }
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: var(--bg-main);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            min-height: 100vh;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        body.dark-mode {
+            background: linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #0F172A 100%);
+        }
+
+        body:not(.dark-mode) {
+            background: linear-gradient(135deg, #F9FAFB 0%, #E0E7FF 50%, #F9FAFB 100%);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 280px;
+            height: 100vh;
+            background: var(--bg-surface);
+            border-right: 2px solid var(--border-color);
+            z-index: 1000;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 2rem 2rem 1.5rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+        }
+
+        .logo-img {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        body.dark-mode .logo-img {
+            color: #0F172A;
+        }
+
+        .logo-text {
+            font-family: 'Sora', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .sidebar-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem 0;
+        }
+
+        .nav-menu {
+            list-style: none;
+            padding: 0 1rem;
+        }
+
+        .nav-item {
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.2rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .nav-link:hover {
+            background: rgba(30, 64, 175, 0.05);
+            color: var(--primary-blue);
+        }
+
+        body.dark-mode .nav-link:hover {
+            background: rgba(212, 175, 55, 0.1);
+        }
+
+        .nav-link.active {
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            color: white;
+            box-shadow: 0 4px 12px rgba(30, 64, 175, 0.3);
+        }
+
+        body.dark-mode .nav-link.active {
+            color: #0F172A;
+        }
+
+        .nav-icon {
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+
+        .user-section {
+            padding: 1.5rem;
+            border-top: 2px solid var(--border-color);
+            flex-shrink: 0;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: linear-gradient(135deg, rgba(30, 64, 175, 0.05), rgba(59, 130, 246, 0.05));
+            border-radius: 12px;
+        }
+
+        body.dark-mode .user-info {
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.1), rgba(201, 162, 39, 0.1));
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        body.dark-mode .user-avatar {
+            color: #0F172A;
+        }
+
+        .user-details {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .user-details h4 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.2rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .user-details p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .admin-badge {
+            background: linear-gradient(135deg, var(--warning), #EF4444);
+            color: white;
+            padding: 0.3rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        body.dark-mode .admin-badge {
+            background: linear-gradient(135deg, #E0C15A, #D4AF37);
+            color: #0F172A;
+        }
+
+        .btn-logout {
+            width: 100%;
+            padding: 0.85rem;
+            background: var(--error);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .btn-logout:hover {
+            background: #DC2626;
+            transform: translateY(-2px);
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 280px;
+            padding: 2rem;
+            min-height: 100vh;
+            transition: margin-left 0.3s ease;
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+        }
+
+        .page-header h1 {
+            font-family: 'Sora', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .page-header p {
+            font-size: 1.05rem;
+            color: var(--text-secondary);
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--border-color);
+            overflow-x: auto;
+            padding-bottom: 0;
+        }
+
+        .tab {
+            padding: 1rem 1.5rem;
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid transparent;
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .tab:hover {
+            color: var(--primary-blue);
+            border-bottom-color: var(--primary-blue);
+        }
+
+        .tab.active {
+            color: var(--primary-blue);
+            border-bottom-color: var(--primary-blue);
+        }
+
+        body.dark-mode .tab.active {
+            color: var(--warning);
+            border-bottom-color: var(--warning);
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--bg-surface);
+            padding: 1.8rem;
+            border-radius: 16px;
+            border: 2px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(30, 64, 175, 0.1);
+        }
+
+        .stat-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary-blue);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Alerts */
+        .alert {
+            padding: 1rem 1.2rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+            display: none;
+            animation: slideDown 0.3s ease;
+        }
+
+        .alert.show {
+            display: block;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert-success {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+            border: 2px solid var(--success);
+        }
+
+        .alert-error {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--error);
+            border: 2px solid var(--error);
+        }
+
+        .alert-warning {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+            border: 2px solid var(--warning);
+        }
+
+        /* Fire Streak Challenge Banner */
+        .fire-challenge-banner {
+            background: linear-gradient(135deg, #FF6B6B, #FF8E53);
+            padding: 1.5rem;
+            border-radius: 16px;
+            margin-bottom: 2rem;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .fire-icon-big {
+            font-size: 3rem;
+            animation: flicker 2s infinite;
+        }
+
+        @keyframes flicker {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.1); }
+        }
+
+        .fire-challenge-content h3 {
+            font-size: 1.4rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .fire-progress {
+            background: rgba(255, 255, 255, 0.2);
+            height: 10px;
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 0.5rem 0;
+        }
+
+        .fire-progress-bar {
+            height: 100%;
+            background: white;
+            border-radius: 5px;
+            transition: width 0.3s ease;
+        }
+
+        /* Mobile Menu */
+        .mobile-menu-toggle {
+            display: none;
+            position: fixed;
+            top: 1.5rem;
+            left: 1.5rem;
+            z-index: 1001;
+            background: var(--primary-blue);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(30, 64, 175, 0.3);
+            border: none;
+        }
+
+        .mobile-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            backdrop-filter: blur(5px);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .mobile-menu-toggle {
+                display: flex;
+            }
+
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .mobile-overlay.active {
+                display: block;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 6rem 1rem 2rem;
+            }
+
+            .page-header h1 {
+                font-size: 1.8rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .fire-challenge-banner {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-content {
+                padding: 5.5rem 0.8rem 1.5rem;
+            }
+
+            .page-header h1 {
+                font-size: 1.6rem;
+            }
+        }
+    </style>
+  <script src="/config.js"></script>
+</head>
+<body>
+    <button class="mobile-menu-toggle" id="mobileMenuToggle">
+        <span style="font-size: 1.5rem;">☰</span>
+    </button>
+    <div class="mobile-overlay" id="mobileOverlay"></div>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="#" class="logo">
+                <img class="logo-img" src="./assets/crie-um-imagem-de-logo-do-discord--deixe-no-tamanh (2).png" alt="">
+                <span class="logo-text">NatanSites</span>
+            </a>
+        </div>
+
+        <div class="sidebar-content">
+            <nav>
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="dashboard.html" class="nav-link active">
+                            <span class="nav-icon">🏠</span>
+                            <span>Início</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="portfolio.html" class="nav-link">
+                            <span class="nav-icon">🌐</span>
+                            <span>Portfólio</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="community.html" class="nav-link">
+                            <span class="nav-icon">👥</span>
+                            <span>Comunidade</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="suporte.html" class="nav-link">
+                            <span class="nav-icon">💬</span>
+                            <span>Suporte</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="natanai.html" class="nav-link">
+                            <span class="nav-icon">🤖</span>
+                            <span>NatanAI</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="settings.html" class="nav-link">
+                            <span class="nav-icon">⚙️</span>
+                            <span>Configurações</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <div class="user-section">
+            <div class="user-info">
+                <div class="user-avatar" id="userAvatar">NS</div>
+                <div class="user-details">
+                    <h4 id="userName">Carregando...</h4>
+                    <p id="userPlan">Verificando...</p>
+                </div>
+            </div>
+            <button class="btn-logout" id="logoutBtn">🚪 Sair</button>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <div class="page-header">
+            <h1>👥 Comunidade NatanSites</h1>
+            <p>Conecte-se, compartilhe e aprenda com outros membros</p>
+        </div>
+
+        <div id="alertBox" class="alert"></div>
+
+        <!-- Fire Streak Challenge Banner -->
+        <div class="fire-challenge-banner">
+            <div class="fire-icon-big">🔥</div>
+            <div class="fire-challenge-content" style="flex: 1;">
+                <h3>Desafio dos 300 Dias 🔥</h3>
+                <p style="margin-bottom: 0.5rem;">Continue sua sequência de mensagens diárias!</p>
+                <div class="fire-progress">
+                    <div class="fire-progress-bar" id="fireProgressBar" style="width: 0%"></div>
+                </div>
+                <p style="font-size: 0.9rem;"><strong id="fireStreakDays">0</strong>/300 dias • Ganhe um site grátis ao completar!</p>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab" onclick="window.location.href='community.html?tab=stats'">📊 Estatísticas</button>
+            <button class="tab" onclick="window.location.href='chat.html?tab=chat'">💬 Chat Privado</button>
+            <button class="tab" onclick="window.location.href='feed.html?tab=feed'">📰 Feed</button>
+            <button class="tab" onclick="window.location.href='websites.html?tab=websites'">🌐 WebSites</button>
+            <button class="tab" onclick="window.location.href='novidades.html?tab=news'">📢 Novidades</button>
+            <button class="tab" onclick="window.location.href='depoimentos.html?tab=events'">⭐ Depoimentos</button>
+        </div>
+
+        <!-- Tab: Estatísticas -->
+        <div class="tab-content active" id="tab-stats">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">👥</div>
+                    <div class="stat-value" id="totalUsers">0</div>
+                    <div class="stat-label">Usuários Cadastrados</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">🌐</div>
+                    <div class="stat-value" id="totalWebsites">0</div>
+                    <div class="stat-label">Sites Criados</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">👁️</div>
+                    <div class="stat-value" id="totalVisits">0</div>
+                    <div class="stat-label">Visitas Totais</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">💬</div>
+                    <div class="stat-value" id="totalMessages">0</div>
+                    <div class="stat-label">Mensagens Enviadas</div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const SUPABASE_URL = window.APP_CONFIG.SUPABASE_URL;
+        const SUPABASE_ANON_KEY = window.APP_CONFIG.SUPABASE_ANON_KEY;
+        const ADMIN_EMAIL = 'natan@natandev.com';
+
+        let currentUser = null;
+        let isAdmin = false;
+
+        try {
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        } catch (error) {
+            console.error('Erro ao inicializar Supabase:', error);
+        }
+
+        async function loadAndApplyTheme() {
+            if (!currentUser) return;
+
+            const settingsKey = `natandev_settings_${currentUser.id}`;
+            const savedSettings = localStorage.getItem(settingsKey);
+            
+            if (savedSettings) {
+                try {
+                    const settings = JSON.parse(savedSettings);
+                    if (settings.darkMode) {
+                        document.body.classList.add('dark-mode');
+                    }
+                } catch (error) {
+                    console.error('Erro ao aplicar tema:', error);
+                }
+            }
+
+            if (!supabase) return;
+
+            try {
+                const { data, error } = await supabase
+                    .from('user_settings')
+                    .select('settings')
+                    .eq('user_id', currentUser.id)
+                    .single();
+
+                if (!error && data?.settings) {
+                    if (data.settings.darkMode) {
+                        document.body.classList.add('dark-mode');
+                    } else {
+                        document.body.classList.remove('dark-mode');
+                    }
+                    localStorage.setItem(settingsKey, JSON.stringify(data.settings));
+                }
+            } catch (error) {
+                console.error('Erro ao carregar tema:', error);
+            }
+        }
+
+        async function checkAuth() {
+            if (!supabase) {
+                console.error('⚠️ Supabase não configurado');
+                window.location.href = 'login.html';
+                return false;
+            }
+
+            try {
+                const { data: { session }, error } = await supabase.auth.getSession();
+                
+                if (error) throw error;
+                
+                if (!session || !session.user) {
+                    console.log('❌ Nenhuma sessão ativa');
+                    window.location.href = 'login.html';
+                    return false;
+                }
+
+                currentUser = session.user;
+                isAdmin = currentUser.email === ADMIN_EMAIL;
+                
+                localStorage.setItem('natandev_is_admin', isAdmin.toString());
+                
+                console.log('✅ Usuário autenticado:', currentUser.email);
+                
+                await loadUserInfo();
+                await loadAndApplyTheme();
+                await loadStatistics();
+                await loadFireStreak();
+                
+                return true;
+                
+            } catch (error) {
+                console.error('Erro ao verificar autenticação:', error);
+                window.location.href = 'login.html';
+                return false;
+            }
+        }
+
+        async function loadUserInfo() {
+            if (!currentUser) return;
+
+            const username = currentUser.email.split('@')[0];
+            const initials = username.substring(0, 2).toUpperCase();
+            
+            document.getElementById('userName').textContent = username;
+            document.getElementById('userAvatar').textContent = initials;
+
+            if (isAdmin) {
+                document.getElementById('userPlan').innerHTML = '👑 <span class="admin-badge">ADMIN</span>';
+            } else {
+                document.getElementById('userPlan').textContent = '✨ Membro';
+            }
+
+            console.log('✅ Interface do usuário carregada');
+        }
+
+        async function loadStatistics() {
+            if (!supabase) return;
+
+            try {
+                const { count: usersCount } = await supabase
+                    .from('user_accounts')
+                    .select('*', { count: 'exact', head: true });
+
+                document.getElementById('totalUsers').textContent = usersCount || 0;
+
+                const { count: websitesCount } = await supabase
+                    .from('user_websites')
+                    .select('*', { count: 'exact', head: true });
+
+                document.getElementById('totalWebsites').textContent = websitesCount || 0;
+
+                const { data: visitsData } = await supabase
+                    .from('user_accounts')
+                    .select('dashboard_visits');
+
+                const totalVisits = visitsData?.reduce((sum, user) => sum + (user.dashboard_visits || 0), 0) || 0;
+                document.getElementById('totalVisits').textContent = totalVisits.toLocaleString('pt-BR');
+
+                const { count: messagesCount } = await supabase
+                    .from('private_messages')
+                    .select('*', { count: 'exact', head: true });
+
+                document.getElementById('totalMessages').textContent = messagesCount || 0;
+
+                console.log('✅ Estatísticas carregadas');
+            } catch (error) {
+                console.error('❌ Erro ao carregar estatísticas:', error);
+            }
+        }
+
+        async function loadFireStreak() {
+            if (!supabase || !currentUser) return;
+
+            try {
+                const { data, error } = await supabase
+                    .from('fire_streak')
+                    .select('*')
+                    .eq('user_id', currentUser.id)
+                    .single();
+
+                if (error && error.code !== 'PGRST116') throw error;
+
+                const streakDays = data?.streak_days || 0;
+                const progress = (streakDays / 300) * 100;
+
+                document.getElementById('fireStreakDays').textContent = streakDays;
+                document.getElementById('fireProgressBar').style.width = `${progress}%`;
+
+                console.log('✅ Fire Streak carregado:', streakDays, 'dias');
+            } catch (error) {
+                console.error('❌ Erro ao carregar Fire Streak:', error);
+            }
+        }
+
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                const tabName = this.dataset.tab;
+
+                if (!tabName) return; // Se não tiver data-tab, é um link externo
+
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+
+                this.classList.add('active');
+                document.getElementById(`tab-${tabName}`).classList.add('active');
+            });
+        });
+
+        function showAlert(message, type) {
+            const alertBox = document.getElementById('alertBox');
+            alertBox.textContent = message;
+            alertBox.className = `alert alert-${type} show`;
+            
+            setTimeout(() => {
+                alertBox.classList.remove('show');
+            }, 5000);
+        }
+
+        document.getElementById('logoutBtn').addEventListener('click', async function() {
+            if (!confirm('Deseja realmente sair?')) return;
+
+            if (supabase) {
+                try {
+                    const { error } = await supabase.auth.signOut();
+                    if (error) throw error;
+                    console.log('✅ Logout realizado');
+                } catch (error) {
+                    console.error('Erro ao fazer logout:', error);
+                }
+            }
+            
+            localStorage.removeItem('natandev_is_admin');
+            if (currentUser) {
+                localStorage.removeItem(`natandev_settings_${currentUser.id}`);
+            }
+            
+            window.location.href = 'login.html';
+        });
+
+        const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+        const sidebar = document.getElementById('sidebar');
+        const mobileOverlay = document.getElementById('mobileOverlay');
+
+        mobileMenuToggle.addEventListener('click', function() {
+            sidebar.classList.toggle('active');
+            mobileOverlay.classList.toggle('active');
+        });
+
+        mobileOverlay.addEventListener('click', function() {
+            sidebar.classList.remove('active');
+            mobileOverlay.classList.remove('active');
+        });
+
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function() {
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.remove('active');
+                    mobileOverlay.classList.remove('active');
+                }
+            });
+        });
+
+        window.addEventListener('storage', function(e) {
+            if (e.key && e.key.startsWith('natandev_settings_') && e.newValue) {
+                try {
+                    const settings = JSON.parse(e.newValue);
+                    if (settings.darkMode) {
+                        document.body.classList.add('dark-mode');
+                    } else {
+                        document.body.classList.remove('dark-mode');
+                    }
+                    console.log('✅ Tema sincronizado via storage event');
+                } catch (error) {
+                    console.error('Erro ao processar storage event:', error);
+                }
+            }
+        });
+
+        let lastSettingsCheck = null;
+        setInterval(async function() {
+            if (!currentUser) return;
+            
+            const settingsKey = `natandev_settings_${currentUser.id}`;
+            const currentSettings = localStorage.getItem(settingsKey);
+            
+            if (currentSettings !== lastSettingsCheck) {
+                lastSettingsCheck = currentSettings;
+                if (currentSettings) {
+                    try {
+                        const settings = JSON.parse(currentSettings);
+                        if (settings.darkMode) {
+                            document.body.classList.add('dark-mode');
+                        } else {
+                            document.body.classList.remove('dark-mode');
+                        }
+                        console.log('✅ Tema sincronizado via polling');
+                    } catch (error) {
+                        console.error('Erro ao aplicar configurações:', error);
+                    }
+                }
+            }
+        }, 1000);
+
+        async function init() {
+            console.log('🚀 Inicializando Comunidade NatanSites...');
+            const authenticated = await checkAuth();
+            
+            if (authenticated) {
+                console.log('✅ Comunidade carregada com sucesso!');
+                console.log('📊 Estatísticas ativas!');
+            }
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    </script>
+</body>
+</html>

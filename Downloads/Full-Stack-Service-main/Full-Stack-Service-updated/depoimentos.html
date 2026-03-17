@@ -1,0 +1,1518 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Depoimentos - NatanSites</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Sora:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-blue: #1E40AF;
+            --secondary-blue: #3B82F6;
+            --bg-main: #F9FAFB;
+            --bg-surface: #FFFFFF;
+            --text-primary: #111827;
+            --text-secondary: #6B7280;
+            --border-color: #E5E7EB;
+            --success: #10B981;
+            --error: #EF4444;
+            --warning: #F59E0B;
+            --star-color: #FBBF24;
+        }
+
+        body.dark-mode {
+            --primary-blue: #D4AF37;
+            --secondary-blue: #C9A227;
+            --bg-main: #0F172A;
+            --bg-surface: #1E293B;
+            --text-primary: #F9FAFB;
+            --text-secondary: #94A3B8;
+            --border-color: #334155;
+            --success: #22C55E;
+            --error: #F87171;
+            --warning: #E0C15A;
+            --star-color: #FCD34D;
+        }
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: var(--bg-main);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            min-height: 100vh;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        body.dark-mode {
+            background: linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #0F172A 100%);
+        }
+
+        body:not(.dark-mode) {
+            background: linear-gradient(135deg, #F9FAFB 0%, #E0E7FF 50%, #F9FAFB 100%);
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 280px;
+            height: 100vh;
+            background: var(--bg-surface);
+            border-right: 2px solid var(--border-color);
+            z-index: 1000;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 2rem 2rem 1.5rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+        }
+
+        .logo-img {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        body.dark-mode .logo-img {
+            color: #0F172A;
+        }
+
+        .logo-text {
+            font-family: 'Sora', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .sidebar-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem 0;
+        }
+
+        .nav-menu {
+            list-style: none;
+            padding: 0 1rem;
+        }
+
+        .nav-item {
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.2rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .nav-link:hover {
+            background: rgba(30, 64, 175, 0.05);
+            color: var(--primary-blue);
+        }
+
+        body.dark-mode .nav-link:hover {
+            background: rgba(212, 175, 55, 0.1);
+        }
+
+        .nav-link.active {
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            color: white;
+            box-shadow: 0 4px 12px rgba(30, 64, 175, 0.3);
+        }
+
+        body.dark-mode .nav-link.active {
+            color: #0F172A;
+        }
+
+        .nav-icon {
+            font-size: 1.3rem;
+        }
+
+        .user-section {
+            padding: 1.5rem;
+            border-top: 2px solid var(--border-color);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: linear-gradient(135deg, rgba(30, 64, 175, 0.05), rgba(59, 130, 246, 0.05));
+            border-radius: 12px;
+        }
+
+        body.dark-mode .user-info {
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.1), rgba(201, 162, 39, 0.1));
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        body.dark-mode .user-avatar {
+            color: #0F172A;
+        }
+
+        .user-details h4 {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 0.2rem;
+        }
+
+        .user-details p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .admin-badge {
+            background: linear-gradient(135deg, var(--warning), #EF4444);
+            color: white;
+            padding: 0.3rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        body.dark-mode .admin-badge {
+            background: linear-gradient(135deg, #E0C15A, #D4AF37);
+            color: #0F172A;
+        }
+
+        .btn-logout {
+            width: 100%;
+            padding: 0.85rem;
+            background: var(--error);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .btn-logout:hover {
+            background: #DC2626;
+            transform: translateY(-2px);
+        }
+
+        .main-content {
+            margin-left: 280px;
+            padding: 2rem 3rem;
+            min-height: 100vh;
+            max-width: 1200px;
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+        }
+
+        .page-header h1 {
+            font-family: 'Sora', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-header p {
+            font-size: 1.05rem;
+            color: var(--text-secondary);
+        }
+
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--border-color);
+            overflow-x: auto;
+        }
+
+        .tab {
+            padding: 1rem 1.5rem;
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid transparent;
+            color: var(--text-secondary);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .tab:hover {
+            color: var(--primary-blue);
+            border-bottom-color: var(--primary-blue);
+        }
+
+        .tab.active {
+            color: var(--primary-blue);
+            border-bottom-color: var(--primary-blue);
+        }
+
+        body.dark-mode .tab.active {
+            color: var(--warning);
+            border-bottom-color: var(--warning);
+        }
+
+        .alert {
+            padding: 1rem 1.2rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+            display: none;
+        }
+
+        .alert.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .alert-success {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+            border: 2px solid var(--success);
+        }
+
+        .alert-error {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--error);
+            border: 2px solid var(--error);
+        }
+
+        .alert-warning {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+            border: 2px solid var(--warning);
+        }
+
+        /* Stats Summary */
+        .stats-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--bg-surface);
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-icon {
+            font-size: 2.5rem;
+        }
+
+        .stat-info h3 {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary-blue);
+            margin-bottom: 0.3rem;
+        }
+
+        .stat-info p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        /* Review Form */
+        .review-form-container {
+            background: var(--bg-surface);
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .review-form-container h3 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .star-rating {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .star {
+            font-size: 2.5rem;
+            color: #D1D5DB;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .star.active, .star:hover {
+            color: var(--star-color);
+            transform: scale(1.1);
+        }
+
+        .rating-text {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+        }
+
+        .form-select, .form-textarea {
+            width: 100%;
+            padding: 0.9rem;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            background: var(--bg-main);
+            color: var(--text-primary);
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1rem;
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+        }
+
+        .char-counter {
+            text-align: right;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 0.3rem;
+        }
+
+        .btn-submit-review {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1.05rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        body.dark-mode .btn-submit-review {
+            color: #0F172A;
+        }
+
+        .btn-submit-review:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(30, 64, 175, 0.3);
+        }
+
+        /* Filters */
+        .filters-bar {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 0.8rem 1.5rem;
+            background: var(--bg-surface);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            background: var(--primary-blue);
+            color: white;
+            border-color: var(--primary-blue);
+        }
+
+        body.dark-mode .filter-btn:hover, body.dark-mode .filter-btn.active {
+            color: #0F172A;
+        }
+
+        /* Reviews List */
+        .reviews-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .review-card {
+            background: var(--bg-surface);
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.8rem;
+            transition: all 0.3s ease;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .review-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .review-card.pinned {
+            border-color: var(--warning);
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
+        }
+
+        .pinned-badge {
+            background: linear-gradient(135deg, var(--warning), #EF4444);
+            color: white;
+            padding: 0.4rem 0.8rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            margin-bottom: 1rem;
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .review-author {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .author-avatar {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        body.dark-mode .author-avatar {
+            color: #0F172A;
+        }
+
+        .author-info h4 {
+            font-weight: 700;
+            font-size: 1.05rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .author-info p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .review-options {
+            cursor: pointer;
+            padding: 0.5rem;
+            font-size: 1.3rem;
+            color: var(--text-secondary);
+        }
+
+        .review-rating {
+            display: flex;
+            gap: 0.3rem;
+            margin-bottom: 1rem;
+        }
+
+        .review-rating .star {
+            font-size: 1.5rem;
+            cursor: default;
+        }
+
+        .review-category {
+            display: inline-block;
+            padding: 0.4rem 0.8rem;
+            background: var(--bg-main);
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--primary-blue);
+            margin-bottom: 1rem;
+        }
+
+        .review-text {
+            color: var(--text-primary);
+            line-height: 1.6;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .review-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .review-date {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .review-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .action-btn {
+            padding: 0.5rem 1rem;
+            background: var(--bg-main);
+            border: none;
+            border-radius: 8px;
+            color: var(--text-secondary);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .action-btn:hover {
+            background: var(--border-color);
+            color: var(--primary-blue);
+        }
+
+        /* Admin Response */
+        .admin-response {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: linear-gradient(135deg, rgba(30, 64, 175, 0.05), rgba(59, 130, 246, 0.05));
+            border-left: 4px solid var(--primary-blue);
+            border-radius: 8px;
+        }
+
+        body.dark-mode .admin-response {
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.1), rgba(201, 162, 39, 0.1));
+            border-left-color: var(--warning);
+        }
+
+        .admin-response-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+        }
+
+        body.dark-mode .admin-response-header {
+            color: var(--warning);
+        }
+
+        .admin-response-text {
+            color: var(--text-primary);
+            line-height: 1.5;
+        }
+
+        .response-form {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: var(--bg-main);
+            border-radius: 8px;
+        }
+
+        .response-input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--bg-surface);
+            color: var(--text-primary);
+            font-family: 'Space Grotesk', sans-serif;
+            margin-bottom: 0.5rem;
+        }
+
+        .response-input:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+        }
+
+        .btn-send-response {
+            padding: 0.7rem 1.5rem;
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        body.dark-mode .btn-send-response {
+            color: #0F172A;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .mobile-menu-toggle {
+            display: none;
+            position: fixed;
+            top: 1.5rem;
+            left: 1.5rem;
+            z-index: 1001;
+            background: var(--primary-blue);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(30, 64, 175, 0.3);
+            border: none;
+        }
+
+        .mobile-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            backdrop-filter: blur(5px);
+        }
+
+        @media (max-width: 768px) {
+            .mobile-menu-toggle {
+                display: flex;
+            }
+
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .mobile-overlay.active {
+                display: block;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 6rem 1rem 2rem;
+            }
+
+            .stats-summary {
+                grid-template-columns: 1fr;
+            }
+
+            .filters-bar {
+                flex-direction: column;
+            }
+
+            .star-rating {
+                justify-content: center;
+            }
+        }
+    </style>
+  <script src="/config.js"></script>
+</head>
+<body>
+    <button class="mobile-menu-toggle" id="mobileMenuToggle">
+        <span style="font-size: 1.5rem;">☰</span>
+    </button>
+    <div class="mobile-overlay" id="mobileOverlay"></div>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="#" class="logo">
+                <img class="logo-img" src="./assets/crie-um-imagem-de-logo-do-discord--deixe-no-tamanh (2).png" alt="">
+                <span class="logo-text">NatanSites</span>
+            </a>
+        </div>
+
+        <div class="sidebar-content">
+            <nav>
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="dashboard.html" class="nav-link">
+                            <span class="nav-icon">🏠</span>
+                            <span>Início</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="portfolio.html" class="nav-link">
+                            <span class="nav-icon">🌐</span>
+                            <span>Portfólio</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="community.html" class="nav-link">
+                            <span class="nav-icon">👥</span>
+                            <span>Comunidade</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="suporte.html" class="nav-link">
+                            <span class="nav-icon">💬</span>
+                            <span>Suporte</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="natanai.html" class="nav-link">
+                            <span class="nav-icon">🤖</span>
+                            <span>NatanAI</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="settings.html" class="nav-link">
+                            <span class="nav-icon">⚙️</span>
+                            <span>Configurações</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <div class="user-section">
+            <div class="user-info">
+                <div class="user-avatar" id="userAvatar">NS</div>
+                <div class="user-details">
+                    <h4 id="userName">Carregando...</h4>
+                    <p id="userPlan">Verificando...</p>
+                </div>
+            </div>
+            <button class="btn-logout" id="logoutBtn">🚪 Sair</button>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <div class="page-header">
+            <h1>⭐ Depoimentos & Avaliações</h1>
+            <p>Avalie nossos serviços e veja o que outros clientes dizem</p>
+        </div>
+
+        <div id="alertBox" class="alert"></div>
+
+        <div class="tabs">
+            <button class="tab" onclick="window.location.href='community.html?tab=stats'">📊 Estatísticas</button>
+            <button class="tab" onclick="window.location.href='chat.html?tab=chat'">💬 Chat Privado</button>
+            <button class="tab" onclick="window.location.href='feed.html?tab=feed'">📰 Feed</button>
+            <button class="tab" onclick="window.location.href='websites.html?tab=websites'">🌐 WebSites</button>
+            <button class="tab" onclick="window.location.href='novidades.html?tab=news'">📢 Novidades</button>
+            <button class="tab" onclick="window.location.href='depoimentos.html?tab=events'">⭐ Depoimentos</button>
+        </div>
+
+        <!-- Stats Summary -->
+        <div class="stats-summary">
+            <div class="stat-card">
+                <div class="stat-icon">⭐</div>
+                <div class="stat-info">
+                    <h3 id="avgRating">0.0</h3>
+                    <p>Média de Avaliações</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">💬</div>
+                <div class="stat-info">
+                    <h3 id="totalReviews">0</h3>
+                    <p>Total de Avaliações</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">👥</div>
+                <div class="stat-info">
+                    <h3 id="totalReviewers">0</h3>
+                    <p>Clientes Avaliaram</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Review Form -->
+        <div class="review-form-container" id="reviewFormContainer">
+            <h3>✍️ Deixe sua Avaliação</h3>
+            <form id="reviewForm">
+                <div class="form-group">
+                    <label>⭐ Sua Avaliação</label>
+                    <div class="star-rating" id="starRating">
+                        <span class="star" data-rating="1">★</span>
+                        <span class="star" data-rating="2">★</span>
+                        <span class="star" data-rating="3">★</span>
+                        <span class="star" data-rating="4">★</span>
+                        <span class="star" data-rating="5">★</span>
+                    </div>
+                    <div class="rating-text" id="ratingText">Selecione uma avaliação</div>
+                    <input type="hidden" id="ratingValue" required>
+                </div>
+
+                <div class="form-group">
+                    <label>📂 Categoria</label>
+                    <select class="form-select" id="reviewCategory" required>
+                        <option value="">Selecione uma categoria...</option>
+                        <option value="servico">Serviço</option>
+                        <option value="atendimento">Atendimento</option>
+                        <option value="qualidade">Qualidade</option>
+                        <option value="prazo">Prazo de Entrega</option>
+                        <option value="suporte">Suporte</option>
+                        <option value="geral">Geral</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>💬 Seu Comentário</label>
+                    <textarea 
+                        class="form-textarea" 
+                        id="reviewText" 
+                        placeholder="Compartilhe sua experiência..."
+                        maxlength="500"
+                        required
+                    ></textarea>
+                    <div class="char-counter">
+                        <span id="charCount">0</span>/500 caracteres
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-submit-review">
+                    🚀 Enviar Avaliação
+                </button>
+            </form>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters-bar">
+            <button class="filter-btn active" data-filter="all" onclick="filterReviews('all')">
+                Todas
+            </button>
+            <button class="filter-btn" data-filter="5" onclick="filterReviews('5')">
+                ⭐⭐⭐⭐⭐
+            </button>
+            <button class="filter-btn" data-filter="4" onclick="filterReviews('4')">
+                ⭐⭐⭐⭐
+            </button>
+            <button class="filter-btn" data-filter="3" onclick="filterReviews('3')">
+                ⭐⭐⭐
+            </button>
+            <button class="filter-btn" data-filter="2" onclick="filterReviews('2')">
+                ⭐⭐
+            </button>
+            <button class="filter-btn" data-filter="1" onclick="filterReviews('1')">
+                ⭐
+            </button>
+        </div>
+
+        <!-- Reviews Container -->
+        <div class="reviews-container" id="reviewsContainer">
+            <div class="empty-state">
+                <div class="empty-icon">⭐</div>
+                <h3>Carregando avaliações...</h3>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const SUPABASE_URL = window.APP_CONFIG.SUPABASE_URL;
+        const SUPABASE_ANON_KEY = window.APP_CONFIG.SUPABASE_ANON_KEY;
+        const ADMIN_EMAIL = 'natan@natandev.com';
+
+        let currentUser = null;
+        let isAdmin = false;
+        let allReviews = [];
+        let currentRating = 0;
+
+        try {
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        } catch (error) {
+            console.error('Erro ao inicializar Supabase:', error);
+        }
+
+        async function checkAuth() {
+            if (!supabase) {
+                window.location.href = 'login.html';
+                return false;
+            }
+
+            try {
+                const { data: { session }, error } = await supabase.auth.getSession();
+                
+                if (error || !session?.user) {
+                    window.location.href = 'login.html';
+                    return false;
+                }
+
+                currentUser = session.user;
+                isAdmin = currentUser.email === ADMIN_EMAIL;
+                
+                await loadUserInfo();
+                await loadAndApplyTheme();
+                await loadReviews();
+                await loadStats();
+                subscribeToRealtimeReviews();
+                
+                return true;
+            } catch (error) {
+                console.error('Erro ao verificar autenticação:', error);
+                window.location.href = 'login.html';
+                return false;
+            }
+        }
+
+        async function loadUserInfo() {
+            const username = currentUser.email.split('@')[0];
+            const initials = username.substring(0, 2).toUpperCase();
+            
+            document.getElementById('userName').textContent = username;
+            document.getElementById('userAvatar').textContent = initials;
+
+            if (isAdmin) {
+                document.getElementById('userPlan').innerHTML = '👑 <span class="admin-badge">ADMIN</span>';
+            } else {
+                document.getElementById('userPlan').textContent = '✨ Membro';
+            }
+        }
+
+        async function loadAndApplyTheme() {
+            const settings = localStorage.getItem(`natandev_settings_${currentUser.id}`);
+            if (settings) {
+                const { darkMode } = JSON.parse(settings);
+                if (darkMode) {
+                    document.body.classList.add('dark-mode');
+                }
+            }
+        }
+
+        // Star Rating System
+        const stars = document.querySelectorAll('.star');
+        stars.forEach(star => {
+            star.addEventListener('click', function() {
+                currentRating = parseInt(this.dataset.rating);
+                document.getElementById('ratingValue').value = currentRating;
+                updateStars(currentRating);
+                updateRatingText(currentRating);
+            });
+
+            star.addEventListener('mouseenter', function() {
+                const rating = parseInt(this.dataset.rating);
+                updateStars(rating, true);
+            });
+        });
+
+        document.getElementById('starRating').addEventListener('mouseleave', function() {
+            updateStars(currentRating);
+        });
+
+        function updateStars(rating, hover = false) {
+            stars.forEach(star => {
+                const starRating = parseInt(star.dataset.rating);
+                if (starRating <= rating) {
+                    star.classList.add('active');
+                } else {
+                    star.classList.remove('active');
+                }
+            });
+        }
+
+        function updateRatingText(rating) {
+            const texts = {
+                1: '⭐ Muito Ruim',
+                2: '⭐⭐ Ruim',
+                3: '⭐⭐⭐ Regular',
+                4: '⭐⭐⭐⭐ Bom',
+                5: '⭐⭐⭐⭐⭐ Excelente'
+            };
+            document.getElementById('ratingText').textContent = texts[rating] || 'Selecione uma avaliação';
+        }
+
+        // Character Counter
+        document.getElementById('reviewText').addEventListener('input', function() {
+            const count = this.value.length;
+            document.getElementById('charCount').textContent = count;
+        });
+
+        // Submit Review
+        document.getElementById('reviewForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const rating = parseInt(document.getElementById('ratingValue').value);
+            const category = document.getElementById('reviewCategory').value;
+            const text = document.getElementById('reviewText').value.trim();
+
+            if (!rating || !category || !text) {
+                showAlert('❌ Preencha todos os campos', 'error');
+                return;
+            }
+
+            try {
+                // Verifica se usuário já avaliou
+                const { data: existingReview } = await supabase
+                    .from('reviews')
+                    .select('*')
+                    .eq('user_id', currentUser.id)
+                    .maybeSingle();
+
+                if (existingReview) {
+                    showAlert('⚠️ Você já enviou uma avaliação!', 'warning');
+                    return;
+                }
+
+                const { error } = await supabase
+                    .from('reviews')
+                    .insert({
+                        user_id: currentUser.id,
+                        user_email: currentUser.email,
+                        rating: rating,
+                        category: category,
+                        review_text: text
+                    });
+
+                if (error) throw error;
+
+                showAlert('✅ Avaliação enviada com sucesso!', 'success');
+                document.getElementById('reviewForm').reset();
+                currentRating = 0;
+                updateStars(0);
+                document.getElementById('charCount').textContent = '0';
+                await loadReviews();
+                await loadStats();
+            } catch (error) {
+                console.error('Erro ao enviar avaliação:', error);
+                showAlert('Erro ao enviar avaliação', 'error');
+            }
+        });
+
+        async function loadReviews() {
+            if (!supabase) return;
+
+            try {
+                const { data: reviews, error } = await supabase
+                    .from('reviews')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                allReviews = reviews || [];
+                renderReviews(allReviews);
+
+                console.log('✅ Avaliações carregadas:', allReviews.length);
+            } catch (error) {
+                console.error('Erro ao carregar avaliações:', error);
+                showAlert('Erro ao carregar avaliações', 'error');
+            }
+        }
+
+        async function loadStats() {
+            if (!supabase) return;
+
+            try {
+                const { data: reviews } = await supabase
+                    .from('reviews')
+                    .select('rating');
+
+                const totalReviews = reviews?.length || 0;
+                document.getElementById('totalReviews').textContent = totalReviews;
+
+                if (totalReviews > 0) {
+                    const avgRating = reviews.reduce((sum, r) => sum + r.rating, 0) / totalReviews;
+                    document.getElementById('avgRating').textContent = avgRating.toFixed(1);
+
+                    const uniqueReviewers = new Set(reviews.map(r => r.user_id));
+                    document.getElementById('totalReviewers').textContent = uniqueReviewers.size;
+                } else {
+                    document.getElementById('avgRating').textContent = '0.0';
+                    document.getElementById('totalReviewers').textContent = '0';
+                }
+            } catch (error) {
+                console.error('Erro ao carregar estatísticas:', error);
+            }
+        }
+
+        function renderReviews(reviews) {
+            const container = document.getElementById('reviewsContainer');
+            container.innerHTML = '';
+
+            if (!reviews || reviews.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">⭐</div>
+                        <h3>Nenhuma avaliação ainda</h3>
+                        <p>Seja o primeiro a avaliar!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            reviews.forEach(review => {
+                renderReviewCard(review);
+            });
+        }
+
+        function renderReviewCard(review) {
+            const container = document.getElementById('reviewsContainer');
+            
+            const username = review.user_email.split('@')[0];
+            const initials = username.substring(0, 2).toUpperCase();
+            
+            const createdDate = new Date(review.created_at);
+            const dateString = createdDate.toLocaleDateString('pt-BR', {
+                day: '2-digit',
+                month: 'long',
+                year: 'numeric'
+            });
+
+            const categoryNames = {
+                'servico': '💼 Serviço',
+                'atendimento': '🤝 Atendimento',
+                'qualidade': '✨ Qualidade',
+                'prazo': '⏰ Prazo',
+                'suporte': '🛟 Suporte',
+                'geral': '🌟 Geral'
+            };
+
+            const card = document.createElement('div');
+            card.className = `review-card ${review.is_pinned ? 'pinned' : ''}`;
+            card.dataset.reviewId = review.id;
+
+            card.innerHTML = `
+                ${review.is_pinned ? '<div class="pinned-badge">📌 Fixado</div>' : ''}
+                
+                <div class="review-header">
+                    <div class="review-author">
+                        <div class="author-avatar">${initials}</div>
+                        <div class="author-info">
+                            <h4>@${username}</h4>
+                            <p>${dateString}</p>
+                        </div>
+                    </div>
+                    ${isAdmin ? `
+                        <div class="review-options" onclick="openReviewOptions('${review.id}')">
+                            ⋮
+                        </div>
+                    ` : ''}
+                </div>
+
+                <div class="review-rating">
+                    ${generateStars(review.rating)}
+                </div>
+
+                <div class="review-category">${categoryNames[review.category] || review.category}</div>
+
+                <div class="review-text">${review.review_text}</div>
+
+                <div class="review-footer">
+                    <div class="review-date">Avaliação enviada em ${dateString}</div>
+                    ${(isAdmin && !review.admin_response) ? `
+                        <div class="review-actions">
+                            <button class="action-btn" onclick="showResponseForm('${review.id}')">
+                                💬 Responder
+                            </button>
+                        </div>
+                    ` : ''}
+                </div>
+
+                ${review.admin_response ? `
+                    <div class="admin-response">
+                        <div class="admin-response-header">
+                            👑 Resposta da Equipe NatanSites
+                        </div>
+                        <div class="admin-response-text">${review.admin_response}</div>
+                    </div>
+                ` : ''}
+
+                <div class="response-form" id="response-form-${review.id}" style="display: none;">
+                    <textarea 
+                        class="response-input" 
+                        id="response-text-${review.id}"
+                        placeholder="Digite sua resposta..."
+                        maxlength="500"
+                    ></textarea>
+                    <button class="btn-send-response" onclick="sendResponse('${review.id}')">
+                        ➤ Enviar Resposta
+                    </button>
+                </div>
+            `;
+
+            container.appendChild(card);
+        }
+
+        function generateStars(rating) {
+            let stars = '';
+            for (let i = 1; i <= 5; i++) {
+                if (i <= rating) {
+                    stars += '<span class="star active">★</span>';
+                } else {
+                    stars += '<span class="star">★</span>';
+                }
+            }
+            return stars;
+        }
+
+        function filterReviews(filter) {
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            let filtered = [...allReviews];
+
+            if (filter !== 'all') {
+                const rating = parseInt(filter);
+                filtered = filtered.filter(r => r.rating === rating);
+            }
+
+            renderReviews(filtered);
+        }
+
+        function openReviewOptions(reviewId) {
+            if (!isAdmin) return;
+
+            const review = allReviews.find(r => r.id === reviewId);
+            
+            const options = prompt(`Opções da avaliação:\n\n1. ${review.is_pinned ? '📍 Desafixar' : '📌 Fixar'}\n2. 🗑️ Excluir\n\nDigite o número:`);
+            
+            switch(options) {
+                case '1':
+                    togglePinReview(reviewId);
+                    break;
+                case '2':
+                    deleteReview(reviewId);
+                    break;
+            }
+        }
+
+        async function togglePinReview(reviewId) {
+            if (!isAdmin) return;
+
+            try {
+                const review = allReviews.find(r => r.id === reviewId);
+
+                await supabase
+                    .from('reviews')
+                    .update({ is_pinned: !review.is_pinned })
+                    .eq('id', reviewId);
+
+                showAlert(`✅ ${!review.is_pinned ? 'Fixado' : 'Desafixado'}!`, 'success');
+                await loadReviews();
+            } catch (error) {
+                console.error('Erro:', error);
+                showAlert('Erro ao fixar avaliação', 'error');
+            }
+        }
+
+        async function deleteReview(reviewId) {
+            if (!isAdmin) return;
+            if (!confirm('Deseja excluir esta avaliação?')) return;
+
+            try {
+                await supabase
+                    .from('reviews')
+                    .delete()
+                    .eq('id', reviewId);
+
+                showAlert('✅ Avaliação excluída!', 'success');
+                await loadReviews();
+                await loadStats();
+            } catch (error) {
+                console.error('Erro:', error);
+                showAlert('Erro ao excluir avaliação', 'error');
+            }
+        }
+
+        function showResponseForm(reviewId) {
+            const form = document.getElementById(`response-form-${reviewId}`);
+            form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        }
+
+        async function sendResponse(reviewId) {
+            if (!isAdmin) return;
+
+            const responseText = document.getElementById(`response-text-${reviewId}`).value.trim();
+
+            if (!responseText) {
+                showAlert('❌ Digite uma resposta', 'error');
+                return;
+            }
+
+            try {
+                await supabase
+                    .from('reviews')
+                    .update({ 
+                        admin_response: responseText,
+                        response_date: new Date().toISOString()
+                    })
+                    .eq('id', reviewId);
+
+                showAlert('✅ Resposta enviada!', 'success');
+                await loadReviews();
+            } catch (error) {
+                console.error('Erro:', error);
+                showAlert('Erro ao enviar resposta', 'error');
+            }
+        }
+
+        function subscribeToRealtimeReviews() {
+            if (!supabase) return;
+
+            supabase
+                .channel('reviews_channel')
+                .on('postgres_changes', 
+                    { event: '*', schema: 'public', table: 'reviews' },
+                    () => {
+                        loadReviews();
+                        loadStats();
+                    }
+                )
+                .subscribe();
+        }
+
+        function showAlert(message, type) {
+            const alertBox = document.getElementById('alertBox');
+            alertBox.textContent = message;
+            alertBox.className = `alert alert-${type} show`;
+            
+            setTimeout(() => {
+                alertBox.classList.remove('show');
+            }, 5000);
+        }
+
+        document.getElementById('logoutBtn').addEventListener('click', async function() {
+            if (!confirm('Deseja realmente sair?')) return;
+
+            if (supabase) {
+                await supabase.auth.signOut();
+            }
+            
+            localStorage.removeItem('natandev_is_admin');
+            if (currentUser) {
+                localStorage.removeItem(`natandev_settings_${currentUser.id}`);
+            }
+            
+            window.location.href = 'login.html';
+        });
+
+        const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+        const sidebar = document.getElementById('sidebar');
+        const mobileOverlay = document.getElementById('mobileOverlay');
+
+        mobileMenuToggle.addEventListener('click', function() {
+            sidebar.classList.toggle('active');
+            mobileOverlay.classList.toggle('active');
+        });
+
+        mobileOverlay.addEventListener('click', function() {
+            sidebar.classList.remove('active');
+            mobileOverlay.classList.remove('active');
+        });
+
+        async function init() {
+            console.log('🚀 Inicializando Depoimentos NatanSites...');
+            await checkAuth();
+            console.log('✅ Depoimentos carregados com sucesso!');
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    </script>
+</body>
+</html>

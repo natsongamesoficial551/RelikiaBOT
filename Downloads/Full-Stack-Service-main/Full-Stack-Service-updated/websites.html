@@ -1,0 +1,1617 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Websites - NatanSites</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Sora:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-blue: #1E40AF;
+            --secondary-blue: #3B82F6;
+            --bg-main: #F9FAFB;
+            --bg-surface: #FFFFFF;
+            --text-primary: #111827;
+            --text-secondary: #6B7280;
+            --border-color: #E5E7EB;
+            --success: #10B981;
+            --error: #EF4444;
+            --warning: #F59E0B;
+        }
+
+        body.dark-mode {
+            --primary-blue: #D4AF37;
+            --secondary-blue: #C9A227;
+            --bg-main: #0F172A;
+            --bg-surface: #1E293B;
+            --text-primary: #F9FAFB;
+            --text-secondary: #94A3B8;
+            --border-color: #334155;
+            --success: #22C55E;
+            --error: #F87171;
+            --warning: #E0C15A;
+        }
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: var(--bg-main);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            min-height: 100vh;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        body.dark-mode {
+            background: linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #0F172A 100%);
+        }
+
+        body:not(.dark-mode) {
+            background: linear-gradient(135deg, #F9FAFB 0%, #E0E7FF 50%, #F9FAFB 100%);
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 280px;
+            height: 100vh;
+            background: var(--bg-surface);
+            border-right: 2px solid var(--border-color);
+            z-index: 1000;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 2rem 2rem 1.5rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+        }
+
+        .logo-img {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        body.dark-mode .logo-img {
+            color: #0F172A;
+        }
+
+        .logo-text {
+            font-family: 'Sora', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .sidebar-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem 0;
+        }
+
+        .nav-menu {
+            list-style: none;
+            padding: 0 1rem;
+        }
+
+        .nav-item {
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.2rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .nav-link:hover {
+            background: rgba(30, 64, 175, 0.05);
+            color: var(--primary-blue);
+        }
+
+        body.dark-mode .nav-link:hover {
+            background: rgba(212, 175, 55, 0.1);
+        }
+
+        .nav-link.active {
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            color: white;
+            box-shadow: 0 4px 12px rgba(30, 64, 175, 0.3);
+        }
+
+        body.dark-mode .nav-link.active {
+            color: #0F172A;
+        }
+
+        .nav-icon {
+            font-size: 1.3rem;
+        }
+
+        .user-section {
+            padding: 1.5rem;
+            border-top: 2px solid var(--border-color);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: linear-gradient(135deg, rgba(30, 64, 175, 0.05), rgba(59, 130, 246, 0.05));
+            border-radius: 12px;
+        }
+
+        body.dark-mode .user-info {
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.1), rgba(201, 162, 39, 0.1));
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        body.dark-mode .user-avatar {
+            color: #0F172A;
+        }
+
+        .user-details h4 {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 0.2rem;
+        }
+
+        .user-details p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .admin-badge {
+            background: linear-gradient(135deg, var(--warning), #EF4444);
+            color: white;
+            padding: 0.3rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        body.dark-mode .admin-badge {
+            background: linear-gradient(135deg, #E0C15A, #D4AF37);
+            color: #0F172A;
+        }
+
+        .btn-logout {
+            width: 100%;
+            padding: 0.85rem;
+            background: var(--error);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .btn-logout:hover {
+            background: #DC2626;
+            transform: translateY(-2px);
+        }
+
+        .main-content {
+            margin-left: 280px;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .page-header-content h1 {
+            font-family: 'Sora', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-header-content p {
+            font-size: 1.05rem;
+            color: var(--text-secondary);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn-publish {
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Sora', sans-serif;
+            box-shadow: 0 4px 14px rgba(30, 64, 175, 0.3);
+        }
+
+        body.dark-mode .btn-publish {
+            color: #0F172A;
+        }
+
+        .btn-publish:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(30, 64, 175, 0.4);
+        }
+
+        .search-filter-bar {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 250px;
+            padding: 0.9rem 1.2rem;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            background: var(--bg-surface);
+            color: var(--text-primary);
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1rem;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+        }
+
+        .filter-btn {
+            padding: 0.9rem 1.5rem;
+            background: var(--bg-surface);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            background: var(--primary-blue);
+            color: white;
+            border-color: var(--primary-blue);
+        }
+
+        body.dark-mode .filter-btn:hover, body.dark-mode .filter-btn.active {
+            color: #0F172A;
+        }
+
+        .stats-bar {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: var(--bg-surface);
+            border-radius: 16px;
+            border: 2px solid var(--border-color);
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .stat-icon {
+            font-size: 2rem;
+        }
+
+        .stat-info h4 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary-blue);
+        }
+
+        .stat-info p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .websites-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .website-card {
+            background: var(--bg-surface);
+            border-radius: 20px;
+            border: 2px solid var(--border-color);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .website-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(30, 64, 175, 0.15);
+        }
+
+        .website-card.pinned {
+            border-color: var(--warning);
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
+        }
+
+        .pinned-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: linear-gradient(135deg, var(--warning), #EF4444);
+            color: white;
+            padding: 0.4rem 0.8rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .website-image {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            background: linear-gradient(135deg, rgba(30, 64, 175, 0.1), rgba(59, 130, 246, 0.1));
+        }
+
+        .website-content {
+            padding: 1.8rem;
+        }
+
+        .website-author {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            margin-bottom: 1rem;
+        }
+
+        .author-avatar {
+            width: 35px;
+            height: 35px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        body.dark-mode .author-avatar {
+            color: #0F172A;
+        }
+
+        .author-info h4 {
+            font-size: 0.95rem;
+            font-weight: 700;
+        }
+
+        .author-info p {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .website-name {
+            font-family: 'Sora', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 0.8rem;
+        }
+
+        .website-url {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            word-break: break-all;
+        }
+
+        .website-stats {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.2rem;
+            padding: 0.8rem;
+            background: var(--bg-main);
+            border-radius: 10px;
+        }
+
+        .stat {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .website-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn-visit {
+            flex: 1;
+            padding: 0.9rem;
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Space Grotesk', sans-serif;
+            text-decoration: none;
+            text-align: center;
+        }
+
+        body.dark-mode .btn-visit {
+            color: #0F172A;
+        }
+
+        .btn-visit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 14px rgba(30, 64, 175, 0.4);
+        }
+
+        .btn-action {
+            padding: 0.9rem 1rem;
+            background: var(--bg-main);
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-action:hover {
+            background: var(--border-color);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-surface);
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-header h2 {
+            font-family: 'Sora', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 800;
+        }
+
+        .btn-close {
+            background: none;
+            border: none;
+            font-size: 2rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: all 0.3s ease;
+        }
+
+        .btn-close:hover {
+            color: var(--error);
+            transform: rotate(90deg);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .form-input, .form-textarea {
+            width: 100%;
+            padding: 0.9rem;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            background: var(--bg-main);
+            color: var(--text-primary);
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1rem;
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-input:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+        }
+
+        .file-input-wrapper {
+            position: relative;
+        }
+
+        .file-input-btn {
+            padding: 1rem;
+            background: var(--bg-main);
+            border: 2px dashed var(--border-color);
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .file-input-btn:hover {
+            border-color: var(--primary-blue);
+            background: rgba(30, 64, 175, 0.05);
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .image-preview {
+            margin-top: 1rem;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .image-preview img {
+            width: 100%;
+            border-radius: 12px;
+        }
+
+        .alert {
+            padding: 1rem 1.2rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+            display: none;
+        }
+
+        .alert.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert-success {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+            border: 2px solid var(--success);
+        }
+
+        .alert-error {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--error);
+            border: 2px solid var(--error);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 6rem 2rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-icon {
+            font-size: 5rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .mobile-menu-toggle {
+            display: none;
+            position: fixed;
+            top: 1.5rem;
+            left: 1.5rem;
+            z-index: 1001;
+            background: var(--primary-blue);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(30, 64, 175, 0.3);
+            border: none;
+        }
+
+        .mobile-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            backdrop-filter: blur(5px);
+        }
+
+        @media (max-width: 768px) {
+            .mobile-menu-toggle {
+                display: flex;
+            }
+
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .mobile-overlay.active {
+                display: block;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 6rem 1rem 2rem;
+            }
+
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .websites-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-bar {
+                flex-direction: column;
+            }
+        }
+    </style>
+  <script src="/config.js"></script>
+</head>
+<body>
+    <button class="mobile-menu-toggle" id="mobileMenuToggle">
+        <span style="font-size: 1.5rem;">☰</span>
+    </button>
+    <div class="mobile-overlay" id="mobileOverlay"></div>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="#" class="logo">
+                <img class="logo-img" src="./assets/crie-um-imagem-de-logo-do-discord--deixe-no-tamanh (2).png" alt="">
+                <span class="logo-text">NatanSites</span>
+            </a>
+        </div>
+
+        <div class="sidebar-content">
+            <nav>
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="dashboard.html" class="nav-link">
+                            <span class="nav-icon">🏠</span>
+                            <span>Início</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="portfolio.html" class="nav-link">
+                            <span class="nav-icon">🌐</span>
+                            <span>Portfólio</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="community.html" class="nav-link">
+                            <span class="nav-icon">👥</span>
+                            <span>Comunidade</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="suporte.html" class="nav-link">
+                            <span class="nav-icon">💬</span>
+                            <span>Suporte</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="natanai.html" class="nav-link">
+                            <span class="nav-icon">🤖</span>
+                            <span>NatanAI</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="settings.html" class="nav-link">
+                            <span class="nav-icon">⚙️</span>
+                            <span>Configurações</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <div class="user-section">
+            <div class="user-info">
+                <div class="user-avatar" id="userAvatar">NS</div>
+                <div class="user-details">
+                    <h4 id="userName">Carregando...</h4>
+                    <p id="userPlan">Verificando...</p>
+                </div>
+            </div>
+            <button class="btn-logout" id="logoutBtn">🚪 Sair</button>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <div class="page-header">
+            <div class="page-header-content">
+                <h1>🌐 Websites Publicados</h1>
+                <p>Explore os sites criados pela comunidade NatanSites</p>
+            </div>
+            <div class="header-actions" id="publishBtn" style="display: none;">
+                <button class="btn-publish" onclick="openPublishModal()">
+                    ➕ Publicar Meu Site
+                </button>
+            </div>
+        </div>
+
+        <div id="alertBox" class="alert"></div>
+
+        <div class="search-filter-bar">
+            <input 
+                type="text" 
+                class="search-input" 
+                id="searchInput"
+                placeholder="🔍 Buscar por nome, autor ou URL..."
+            >
+            <button class="filter-btn active" data-filter="all" onclick="filterWebsites('all')">
+                Todos
+            </button>
+            <button class="filter-btn" data-filter="recent" onclick="filterWebsites('recent')">
+                Recentes
+            </button>
+            <button class="filter-btn" data-filter="popular" onclick="filterWebsites('popular')">
+                Populares
+            </button>
+        </div>
+
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-icon">🌐</div>
+                <div class="stat-info">
+                    <h4 id="totalWebsites">0</h4>
+                    <p>Sites Publicados</p>
+                </div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-icon">👥</div>
+                <div class="stat-info">
+                    <h4 id="totalAuthors">0</h4>
+                    <p>Criadores</p>
+                </div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-icon">👁️</div>
+                <div class="stat-info">
+                    <h4 id="totalViews">0</h4>
+                    <p>Visualizações</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="websites-grid" id="websitesGrid">
+            <div class="empty-state">
+                <div class="empty-icon">🌐</div>
+                <h3>Carregando websites...</h3>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal Publicar -->
+    <div class="modal" id="publishModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🌐 Publicar Meu Site</h2>
+                <button class="btn-close" onclick="closePublishModal()">×</button>
+            </div>
+
+            <form id="publishForm">
+                <div class="form-group">
+                    <label>Selecione o site do seu portfólio</label>
+                    <select class="form-input" id="websiteSelect" required>
+                        <option value="">Carregando...</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Descrição da Publicação (opcional)</label>
+                    <textarea 
+                        class="form-textarea" 
+                        id="publishDescription"
+                        placeholder="Conte mais sobre seu site..."
+                        maxlength="500"
+                    ></textarea>
+                </div>
+
+                <button type="submit" class="btn-publish" style="width: 100%;">
+                    🚀 Publicar Agora
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = window.APP_CONFIG.SUPABASE_URL;
+        const SUPABASE_ANON_KEY = window.APP_CONFIG.SUPABASE_ANON_KEY;
+        const ADMIN_EMAIL = 'natan@natandev.com';
+
+        let currentUser = null;
+        let isAdmin = false;
+        let allWebsites = [];
+        let currentFilter = 'all';
+
+        try {
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        } catch (error) {
+            console.error('Erro ao inicializar Supabase:', error);
+        }
+
+        async function loadAndApplyTheme() {
+            if (!currentUser) return;
+
+            const settingsKey = `natandev_settings_${currentUser.id}`;
+            const savedSettings = localStorage.getItem(settingsKey);
+            
+            if (savedSettings) {
+                try {
+                    const settings = JSON.parse(savedSettings);
+                    if (settings.darkMode) {
+                        document.body.classList.add('dark-mode');
+                    }
+                } catch (error) {
+                    console.error('Erro ao aplicar tema:', error);
+                }
+            }
+
+            if (!supabase) return;
+
+            try {
+                const { data, error } = await supabase
+                    .from('user_settings')
+                    .select('settings')
+                    .eq('user_id', currentUser.id)
+                    .single();
+
+                if (!error && data?.settings) {
+                    if (data.settings.darkMode) {
+                        document.body.classList.add('dark-mode');
+                    } else {
+                        document.body.classList.remove('dark-mode');
+                    }
+                    localStorage.setItem(settingsKey, JSON.stringify(data.settings));
+                }
+            } catch (error) {
+                console.error('Erro ao carregar tema:', error);
+            }
+        }
+
+        async function checkAuth() {
+            if (!supabase) {
+                console.error('⚠️ Supabase não configurado');
+                window.location.href = 'login.html';
+                return false;
+            }
+
+            try {
+                const { data: { session }, error } = await supabase.auth.getSession();
+                
+                if (error) throw error;
+                
+                if (!session || !session.user) {
+                    console.log('❌ Nenhuma sessão ativa');
+                    window.location.href = 'login.html';
+                    return false;
+                }
+
+                currentUser = session.user;
+                isAdmin = currentUser.email === ADMIN_EMAIL;
+                
+                localStorage.setItem('natandev_is_admin', isAdmin.toString());
+                
+                console.log('✅ Usuário autenticado:', currentUser.email);
+                
+                await loadUserInfo();
+                await loadAndApplyTheme();
+                await loadPublishedWebsites();
+                await loadStats();
+                subscribeToRealtime();
+                
+                // Verifica se usuário tem sites no portfólio para poder publicar
+                await checkCanPublish();
+                
+                return true;
+                
+            } catch (error) {
+                console.error('Erro ao verificar autenticação:', error);
+                window.location.href = 'login.html';
+                return false;
+            }
+        }
+
+        async function loadUserInfo() {
+            if (!currentUser) return;
+
+            const username = currentUser.email.split('@')[0];
+            const initials = username.substring(0, 2).toUpperCase();
+            
+            document.getElementById('userName').textContent = username;
+            document.getElementById('userAvatar').textContent = initials;
+
+            if (isAdmin) {
+                document.getElementById('userPlan').innerHTML = '👑 <span class="admin-badge">ADMIN</span>';
+            } else {
+                document.getElementById('userPlan').textContent = '✨ Membro';
+            }
+
+            console.log('✅ Interface do usuário carregada');
+        }
+
+        async function checkCanPublish() {
+            if (!supabase || !currentUser) return;
+
+            try {
+                const { data: portfolioWebsites, error } = await supabase
+                    .from('user_websites')
+                    .select('*')
+                    .eq('user_email', currentUser.email);
+
+                if (!error && portfolioWebsites && portfolioWebsites.length > 0) {
+                    document.getElementById('publishBtn').style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Erro ao verificar portfólio:', error);
+            }
+        }
+
+        async function loadPublishedWebsites() {
+            if (!supabase) return;
+
+            try {
+                const { data: websites, error } = await supabase
+                    .from('published_websites')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                allWebsites = websites || [];
+                renderWebsites(allWebsites);
+
+                console.log('✅ Websites carregados:', allWebsites.length);
+            } catch (error) {
+                console.error('❌ Erro ao carregar websites:', error);
+                showAlert('Erro ao carregar websites', 'error');
+                document.getElementById('websitesGrid').innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">❌</div>
+                        <h3>Erro ao carregar</h3>
+                        <p>Tente recarregar a página</p>
+                    </div>
+                `;
+            }
+        }
+
+        async function loadStats() {
+            if (!supabase) return;
+
+            try {
+                const { count: websitesCount } = await supabase
+                    .from('published_websites')
+                    .select('*', { count: 'exact', head: true });
+
+                document.getElementById('totalWebsites').textContent = websitesCount || 0;
+
+                const { data: websites } = await supabase
+                    .from('published_websites')
+                    .select('author_email');
+
+                const uniqueAuthors = new Set(websites?.map(w => w.author_email) || []);
+                document.getElementById('totalAuthors').textContent = uniqueAuthors.size;
+
+                const { data: viewsData } = await supabase
+                    .from('published_websites')
+                    .select('views');
+
+                const totalViews = viewsData?.reduce((sum, w) => sum + (w.views || 0), 0) || 0;
+                document.getElementById('totalViews').textContent = totalViews.toLocaleString('pt-BR');
+
+                console.log('✅ Estatísticas carregadas');
+            } catch (error) {
+                console.error('❌ Erro ao carregar estatísticas:', error);
+            }
+        }
+
+        function getDefaultWebsiteImage(siteName) {
+            // Cria uma imagem SVG inline como fallback
+            const initial = siteName.charAt(0).toUpperCase();
+            const colors = [
+                { bg: '#1E40AF', text: '#FFFFFF' },
+                { bg: '#7C3AED', text: '#FFFFFF' },
+                { bg: '#DB2777', text: '#FFFFFF' },
+                { bg: '#DC2626', text: '#FFFFFF' },
+                { bg: '#EA580C', text: '#FFFFFF' },
+                { bg: '#CA8A04', text: '#FFFFFF' },
+                { bg: '#16A34A', text: '#FFFFFF' },
+                { bg: '#0891B2', text: '#FFFFFF' }
+            ];
+            
+            const colorIndex = siteName.charCodeAt(0) % colors.length;
+            const color = colors[colorIndex];
+            
+            const svg = `
+                <svg width="400" height="220" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="400" height="220" fill="${color.bg}"/>
+                    <text x="50%" y="50%" font-family="Arial, sans-serif" font-size="80" font-weight="bold" fill="${color.text}" text-anchor="middle" dominant-baseline="middle">${initial}</text>
+                    <text x="50%" y="70%" font-family="Arial, sans-serif" font-size="20" fill="${color.text}" text-anchor="middle" dominant-baseline="middle" opacity="0.8">NatanSites</text>
+                </svg>
+            `;
+            
+            return 'data:image/svg+xml;base64,' + btoa(svg);
+        }
+
+        function renderWebsites(websites) {
+            const grid = document.getElementById('websitesGrid');
+            grid.innerHTML = '';
+
+            if (!websites || websites.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">🌐</div>
+                        <h3>Nenhum website publicado ainda</h3>
+                        <p>Seja o primeiro a compartilhar seu site!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            websites.forEach(website => {
+                const authorUsername = website.author_email.split('@')[0];
+                const authorInitials = authorUsername.substring(0, 2).toUpperCase();
+                
+                const createdDate = new Date(website.created_at);
+                const dateString = createdDate.toLocaleDateString('pt-BR', {
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric'
+                });
+
+                const card = document.createElement('div');
+                card.className = `website-card ${website.is_pinned ? 'pinned' : ''}`;
+                card.dataset.websiteId = website.id;
+
+                card.innerHTML = `
+                    ${website.is_pinned ? '<div class="pinned-badge">📌 Fixado</div>' : ''}
+                    
+                    <img 
+                        src="${website.image_url || getDefaultWebsiteImage(website.site_name)}" 
+                        alt="${website.site_name}" 
+                        class="website-image"
+                        onerror="this.src='${getDefaultWebsiteImage(website.site_name)}'"
+                    >
+                    
+                    <div class="website-content">
+                        <div class="website-author">
+                            <div class="author-avatar">${authorInitials}</div>
+                            <div class="author-info">
+                                <h4>@${authorUsername}</h4>
+                                <p>${dateString}</p>
+                            </div>
+                        </div>
+
+                        <h3 class="website-name">${website.site_name}</h3>
+                        
+                        ${website.description ? `<p class="website-url">${website.description}</p>` : ''}
+                        
+                        <p class="website-url">${website.site_url}</p>
+
+                        <div class="website-stats">
+                            <div class="stat">👁️ ${website.views || 0}</div>
+                            <div class="stat">❤️ ${website.likes || 0}</div>
+                        </div>
+
+                        <div class="website-actions">
+                            <a href="${website.site_url}" target="_blank" class="btn-visit" onclick="incrementViews('${website.id}')">
+                                Visitar Site →
+                            </a>
+                            <button class="btn-action" onclick="toggleLike('${website.id}')" title="Curtir">
+                                ${website.user_liked ? '❤️' : '🤍'}
+                            </button>
+                            <button class="btn-action" onclick="shareWebsite('${website.id}', '${website.site_name}', '${website.site_url}')" title="Compartilhar">
+                                🔗
+                            </button>
+                            ${(isAdmin || currentUser.email === website.author_email) ? `
+                                <button class="btn-action" onclick="openWebsiteOptions('${website.id}')" title="Opções">
+                                    ⋮
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+
+                grid.appendChild(card);
+            });
+        }
+
+        async function incrementViews(websiteId) {
+            if (!supabase) return;
+
+            try {
+                await supabase.rpc('increment_website_views', { website_id: websiteId });
+            } catch (error) {
+                console.error('Erro ao incrementar views:', error);
+            }
+        }
+
+        async function toggleLike(websiteId) {
+            if (!supabase || !currentUser) return;
+
+            try {
+                const { data: existingLike } = await supabase
+                    .from('website_likes')
+                    .select('*')
+                    .eq('website_id', websiteId)
+                    .eq('user_id', currentUser.id)
+                    .maybeSingle();
+
+                if (existingLike) {
+                    await supabase
+                        .from('website_likes')
+                        .delete()
+                        .eq('website_id', websiteId)
+                        .eq('user_id', currentUser.id);
+
+                    await supabase.rpc('decrement_website_likes', { website_id: websiteId });
+                } else {
+                    await supabase
+                        .from('website_likes')
+                        .insert({
+                            website_id: websiteId,
+                            user_id: currentUser.id,
+                            user_email: currentUser.email
+                        });
+
+                    await supabase.rpc('increment_website_likes', { website_id: websiteId });
+                }
+
+                await loadPublishedWebsites();
+                await loadStats();
+            } catch (error) {
+                console.error('Erro ao curtir:', error);
+                showAlert('Erro ao processar curtida', 'error');
+            }
+        }
+
+        function openWebsiteOptions(websiteId) {
+            const options = prompt(`Opções do website:\n\n1. ${isAdmin ? '📌 Fixar/Desafixar' : ''}\n2. 🗑️ Remover publicação\n\nDigite o número:`);
+            
+            switch(options) {
+                case '1':
+                    if (isAdmin) togglePin(websiteId);
+                    break;
+                case '2':
+                    deletePublication(websiteId);
+                    break;
+            }
+        }
+
+        async function togglePin(websiteId) {
+            if (!isAdmin) return;
+
+            try {
+                const { data: website } = await supabase
+                    .from('published_websites')
+                    .select('is_pinned')
+                    .eq('id', websiteId)
+                    .single();
+
+                await supabase
+                    .from('published_websites')
+                    .update({ is_pinned: !website.is_pinned })
+                    .eq('id', websiteId);
+
+                showAlert(`✅ ${!website.is_pinned ? 'Fixado' : 'Desafixado'}!`, 'success');
+                await loadPublishedWebsites();
+            } catch (error) {
+                console.error('Erro:', error);
+            }
+        }
+
+        async function deletePublication(websiteId) {
+            if (!confirm('Deseja remover esta publicação?')) return;
+
+            try {
+                await supabase
+                    .from('published_websites')
+                    .delete()
+                    .eq('id', websiteId);
+
+                showAlert('✅ Publicação removida!', 'success');
+                await loadPublishedWebsites();
+                await loadStats();
+            } catch (error) {
+                console.error('Erro:', error);
+                showAlert('Erro ao remover publicação', 'error');
+            }
+        }
+
+        function filterWebsites(filter) {
+            currentFilter = filter;
+
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            let filtered = [...allWebsites];
+
+            switch(filter) {
+                case 'recent':
+                    filtered.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+                    break;
+                case 'popular':
+                    filtered.sort((a, b) => (b.views || 0) - (a.views || 0));
+                    break;
+            }
+
+            renderWebsites(filtered);
+        }
+
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const query = e.target.value.toLowerCase().trim();
+
+            if (!query) {
+                renderWebsites(allWebsites);
+                return;
+            }
+
+            const filtered = allWebsites.filter(w => 
+                w.site_name.toLowerCase().includes(query) ||
+                w.author_email.toLowerCase().includes(query) ||
+                w.site_url.toLowerCase().includes(query) ||
+                (w.description && w.description.toLowerCase().includes(query))
+            );
+
+            renderWebsites(filtered);
+        });
+
+        async function openPublishModal() {
+            document.getElementById('publishModal').classList.add('show');
+            await loadUserWebsites();
+        }
+
+        function closePublishModal() {
+            document.getElementById('publishModal').classList.remove('show');
+            document.getElementById('publishForm').reset();
+        }
+
+        async function loadUserWebsites() {
+            if (!supabase || !currentUser) return;
+
+            const select = document.getElementById('websiteSelect');
+            select.innerHTML = '<option value="">Carregando...</option>';
+
+            try {
+                const { data: websites, error } = await supabase
+                    .from('user_websites')
+                    .select('*')
+                    .eq('user_email', currentUser.email);
+
+                if (error) throw error;
+
+                select.innerHTML = '<option value="">Selecione um site...</option>';
+
+                if (websites && websites.length > 0) {
+                    websites.forEach(website => {
+                        const option = document.createElement('option');
+                        option.value = website.id;
+                        option.textContent = website.site_name;
+                        option.dataset.url = website.site_url;
+                        option.dataset.image = website.image_url;
+                        select.appendChild(option);
+                    });
+                } else {
+                    select.innerHTML = '<option value="">Nenhum site no portfólio</option>';
+                }
+            } catch (error) {
+                console.error('Erro ao carregar websites:', error);
+                select.innerHTML = '<option value="">Erro ao carregar</option>';
+            }
+        }
+
+        document.getElementById('publishForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const select = document.getElementById('websiteSelect');
+            const selectedOption = select.options[select.selectedIndex];
+            
+            if (!selectedOption.value) {
+                showAlert('Selecione um site para publicar', 'error');
+                return;
+            }
+
+            const description = document.getElementById('publishDescription').value.trim();
+
+            try {
+                const { data: existingPublication } = await supabase
+                    .from('published_websites')
+                    .select('*')
+                    .eq('site_url', selectedOption.dataset.url)
+                    .maybeSingle();
+
+                if (existingPublication) {
+                    showAlert('⚠️ Este site já foi publicado!', 'error');
+                    return;
+                }
+
+                const { error } = await supabase
+                    .from('published_websites')
+                    .insert({
+                        author_id: currentUser.id,
+                        author_email: currentUser.email,
+                        site_name: selectedOption.textContent,
+                        site_url: selectedOption.dataset.url,
+                        image_url: selectedOption.dataset.image,
+                        description: description || null
+                    });
+
+                if (error) throw error;
+
+                showAlert('✅ Site publicado com sucesso!', 'success');
+                closePublishModal();
+                await loadPublishedWebsites();
+                await loadStats();
+            } catch (error) {
+                console.error('Erro ao publicar:', error);
+                showAlert('Erro ao publicar site', 'error');
+            }
+        });
+
+        function subscribeToRealtime() {
+            if (!supabase) return;
+
+            supabase
+                .channel('published_websites_channel')
+                .on('postgres_changes', 
+                    { event: '*', schema: 'public', table: 'published_websites' },
+                    () => {
+                        loadPublishedWebsites();
+                        loadStats();
+                    }
+                )
+                .subscribe();
+        }
+
+        function showAlert(message, type) {
+            const alertBox = document.getElementById('alertBox');
+            alertBox.textContent = message;
+            alertBox.className = `alert alert-${type} show`;
+            
+            setTimeout(() => {
+                alertBox.classList.remove('show');
+            }, 5000);
+        }
+
+        async function shareWebsite(websiteId, siteName, siteUrl) {
+            const shareData = {
+                title: `${siteName} - NatanSites`,
+                text: `Confira este site incrível criado na NatanSites: ${siteName}`,
+                url: siteUrl
+            };
+
+            // Se suporta Web Share API (mobile)
+            if (navigator.share) {
+                try {
+                    await navigator.share(shareData);
+                    showAlert('✅ Compartilhado com sucesso!', 'success');
+                    
+                    // Incrementa contador de compartilhamentos
+                    await incrementShares(websiteId);
+                } catch (error) {
+                    if (error.name !== 'AbortError') {
+                        console.error('Erro ao compartilhar:', error);
+                    }
+                }
+            } else {
+                // Fallback: Copia o link
+                try {
+                    await navigator.clipboard.writeText(siteUrl);
+                    showAlert('✅ Link copiado para a área de transferência!', 'success');
+                    
+                    // Incrementa contador de compartilhamentos
+                    await incrementShares(websiteId);
+                } catch (error) {
+                    console.error('Erro ao copiar:', error);
+                    showAlert('❌ Erro ao copiar link', 'error');
+                }
+            }
+        }
+
+        async function incrementShares(websiteId) {
+            if (!supabase) return;
+
+            try {
+                await supabase.rpc('increment_website_shares', { website_id: websiteId });
+            } catch (error) {
+                console.error('Erro ao incrementar compartilhamentos:', error);
+            }
+        }
+
+        document.getElementById('logoutBtn').addEventListener('click', async function() {
+            if (!confirm('Deseja realmente sair?')) return;
+
+            if (supabase) {
+                try {
+                    await supabase.auth.signOut();
+                } catch (error) {
+                    console.error('Erro ao fazer logout:', error);
+                }
+            }
+            
+            localStorage.removeItem('natandev_is_admin');
+            if (currentUser) {
+                localStorage.removeItem(`natandev_settings_${currentUser.id}`);
+            }
+            
+            window.location.href = 'login.html';
+        });
+
+        const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+        const sidebar = document.getElementById('sidebar');
+        const mobileOverlay = document.getElementById('mobileOverlay');
+
+        mobileMenuToggle.addEventListener('click', function() {
+            sidebar.classList.toggle('active');
+            mobileOverlay.classList.toggle('active');
+        });
+
+        mobileOverlay.addEventListener('click', function() {
+            sidebar.classList.remove('active');
+            mobileOverlay.classList.remove('active');
+        });
+
+        window.addEventListener('storage', function(e) {
+            if (e.key && e.key.startsWith('natandev_settings_') && e.newValue) {
+                try {
+                    const settings = JSON.parse(e.newValue);
+                    if (settings.darkMode) {
+                        document.body.classList.add('dark-mode');
+                    } else {
+                        document.body.classList.remove('dark-mode');
+                    }
+                } catch (error) {
+                    console.error('Erro ao processar storage event:', error);
+                }
+            }
+        });
+
+        async function init() {
+            console.log('🚀 Inicializando Websites Publicados...');
+            await checkAuth();
+            console.log('✅ Websites carregados com sucesso!');
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    </script>
+</body>
+</html>
